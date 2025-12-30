@@ -1,0 +1,451 @@
+/* Dashboard page matching login/register theme */
+body,
+.dashboard-bg {
+  background: #f7fafc;
+  min-height: 100vh;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.45);
+  backdrop-filter: blur(6px);
+}
+
+.dashboard-side {
+  flex: 1 1 420px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.03)
+  );
+  color: #fff;
+  padding: 48px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.side-illustration {
+  width: 120px;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.side-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.side-sub {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.side-features {
+  margin-top: 6px;
+  padding-left: 18px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.dashboard-card {
+  flex: 1 1 520px;
+  background: #fff;
+  padding: 36px;
+}
+
+.dashboard-header {
+  margin-bottom: 12px;
+}
+
+.dashboard-title {
+  margin: 0;
+  font-size: 22px;
+  color: #073b4c;
+}
+
+.dashboard-desc {
+  color: #556;
+  margin-top: 6px;
+}
+
+.dashboard-content {
+  margin-top: 18px;
+}
+
+.dashboard-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.stat-box {
+  background: #f7fafc;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(43, 138, 239, 0.08);
+  padding: 18px 24px;
+  min-width: 120px;
+  text-align: center;
+}
+
+.stat-box h4 {
+  margin: 0 0 8px 0;
+  color: #2b8aef;
+  font-size: 16px;
+}
+
+.stat-box p {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #073b4c;
+}
+
+.dashboard-charts {
+  background: #f7fafc;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(43, 138, 239, 0.08);
+  padding: 24px;
+  min-height: 180px;
+  text-align: center;
+  color: #39404a;
+}
+
+/* Dashboard full viewport layout */
+.dashboard-root {
+  display: flex;
+  min-height: 100vh;
+  width: 99vw;
+  background: #f5f7fa;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+}
+
+.dashboard-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 240px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1fa2ff 0%, #12d8fa 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 32px 0 24px 0;
+  box-shadow: 2px 0 16px rgba(52, 156, 251, 0.08);
+  z-index: 10;
+}
+.sidebar-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-left: 32px;
+  margin-bottom: 32px;
+}
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-left: 32px;
+  margin-bottom: auto;
+}
+.sidebar-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.08rem;
+  opacity: 0.85;
+  padding: 6px 0;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.sidebar-link.active,
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  opacity: 1;
+}
+.sidebar-logout {
+  margin-left: 32px;
+  margin-top: 32px;
+}
+.logout-btn {
+  background: #fff;
+  color: #1fa2ff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(52, 156, 251, 0.08);
+  transition: background 0.15s;
+}
+.logout-btn:hover {
+  background: #eaf4ff;
+}
+
+.dashboard-main {
+  margin-left: 250px;
+  flex: 1;
+  min-height: 100vh;
+  max-width: calc(100vw - 250px);
+  min-width: (100vw - 250px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 0;
+}
+
+.dashboard-content {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dashboard-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+.dashboard-search {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ee;
+  font-size: 1rem;
+  background: #fff;
+  width: 220px;
+  box-shadow: 0 2px 8px rgba(18, 216, 250, 0.08);
+  color: black;
+}
+.dashboard-icons {
+  display: flex;
+  gap: 16px;
+  font-size: 1.3rem;
+  color: #1fa2ff;
+}
+.icon {
+  cursor: pointer;
+}
+
+.dashboard-cards {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+.dashboard-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(18, 216, 250, 0.1);
+  padding: 32px 40px;
+  min-width: 220px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.card-label {
+  font-size: 1.08rem;
+  color: #1fa2ff;
+  margin-bottom: 8px;
+}
+.card-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #073b4c;
+}
+
+.dashboard-expense-list {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(18, 216, 250, 0.1);
+  padding: 20px;
+  margin-top: 0;
+}
+.expense-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.expense-list-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #073b4c;
+}
+.expense-list-filter {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ee;
+  font-size: 1rem;
+  background: #f5f7fa;
+  color: black;
+}
+.expense-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 18px;
+}
+.expense-table th,
+.expense-table td {
+  padding: 16px 12px;
+  text-align: left;
+  font-size: 1rem;
+  color: #073b4c;
+}
+.expense-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+  color: #1fa2ff;
+}
+.expense-table tr {
+  border-bottom: 1px solid #e6e9ee;
+}
+.add-expense-btn {
+  background: linear-gradient(90deg, #1fa2ff, #12d8fa);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 32px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(18, 216, 250, 0.12);
+  transition: background 0.15s;
+  margin-top: 12px;
+}
+.add-expense-btn:hover {
+  background: #1fa2ff;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-content {
+    max-width: 100%;
+    padding: 0 12px;
+  }
+}
+@media (max-width: 900px) {
+  .dashboard-root {
+    flex-direction: column;
+  }
+  .dashboard-sidebar {
+    position: static;
+    width: 100%;
+    min-height: unset;
+    flex-direction: row;
+    align-items: center;
+    padding: 18px 0 18px 0;
+    box-shadow: none;
+    justify-content: space-between;
+  }
+  .sidebar-title {
+    margin: 0 18px 0 18px;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+    gap: 12px;
+    margin: 0;
+  }
+  .sidebar-logout {
+    margin: 0 18px 0 0;
+  }
+
+  .dashboard-cards {
+    flex-direction: cButtolumn;
+    gap: 12px;
+  }
+  .dashboard-expense-list {
+    padding: 18px;
+  }
+}
+
+/* Notification Box */
+.notification {
+  position: fixed;
+  top: 30px;
+  right: -350px;
+  background-color: #ff4d4d;
+  color: white;
+  padding: 10px 20px;
+  min-width: 250px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.5s forwards;
+}
+
+/* Slide in animation */
+@keyframes slideIn {
+  from {
+    right: -350px;
+  }
+  to {
+    right: 20px;
+  }
+}
+
+/* Fade-out animation */
+.fadeOut {
+  animation: fadeOut 0.5s forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    right: 20px;
+  }
+  to {
+    opacity: 0;
+    right: -350px;
+  }
+}
+
+/* Close Button */
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.notification.hide {
+  transform: translateX(150%);
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+/* Graph Forwad / Backward  */
+.graph-nav-btn {
+  background: #1fa2ff;
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* ------- Button Forward abd Backwand on Expense List ------------  */
+.list-icon {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.list-icon button {
+  background-color: white;
+  padding: 0%;
+}

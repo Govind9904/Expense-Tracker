@@ -1,0 +1,22 @@
+.report-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.filter-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.report-header select,
+.filter-inputs input {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}

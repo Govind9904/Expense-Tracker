@@ -1,0 +1,233 @@
+.register-bg {
+  height: 100vh;
+  width: 100vw;
+  background-image: linear-gradient(135deg, rgba(6, 78, 59, 0.85), rgba(3, 105, 161, 0.85)), url('/src/assets/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+.register-container {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  background: rgba(255,255,255,0.06);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.45);
+  backdrop-filter: blur(6px);
+}
+
+.register-side {
+  flex: 1 1 420px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  color: #fff;
+  padding: 48px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.side-illustration {
+  width: 120px;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+}
+
+.side-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.side-sub {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.side-features {
+  margin-top: 6px;
+  padding-left: 18px;
+  color: rgba(255,255,255,0.95);
+}
+
+.register-card {
+  flex: 1 1 520px;
+  background: #fff;
+  padding: 36px;
+}
+
+.register-header {
+  margin-bottom: 12px;
+}
+
+.register-title {
+  margin: 0;
+  font-size: 22px;
+  color: #073b4c;
+}
+
+.register-desc {
+  color: #556;
+  margin-top: 6px;
+}
+
+.register-form {
+  margin-top: 18px;
+}
+
+.name-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.register-group {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.register-group label {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #39404a;
+}
+
+.register-group input {
+  padding: 12px 12px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ee;
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+
+.register-group input:focus {
+  border-color: #2b8aef;
+  box-shadow: 0 6px 18px rgba(43,138,239,0.12);
+}
+
+.password-group .password-field {
+  display: flex;
+  align-items: center;
+}
+
+.password-field input {
+  flex: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.toggle-visibility {
+  border: 1px solid #e6e9ee;
+  background: #fff;
+  padding: 10px 12px;
+  border-left: none;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  cursor: pointer;
+}
+
+.register-error {
+  color: #b00020;
+  background: #ffeef0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg,#1fa2ff,#12d8fa);
+  color: #fff;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  margin-top: 8px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(18,216,250,0.16);
+}
+
+.register-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.register-footer {
+  margin-top: 14px;
+  text-align: center;
+  color: #556;
+}
+
+@media (max-width: 880px) {
+  .register-container {
+    flex-direction: column-reverse;
+    max-width: 560px;
+    margin: 0 20px;
+  }
+
+  .register-side {
+    padding: 22px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .name-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Notification */
+.notification {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  background-color: #ff4d4d;
+  color: white;
+  padding: 10px 20px;
+  min-width: 260px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+  transform: translateX(150%);
+  opacity: 0;
+  transition: transform 0.45s ease, opacity 0.45s ease;
+}
+
+.notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.notification.hide {
+  transform: translateX(150%);
+  opacity: 0;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.close-btn:hover {
+  opacity: 0.7;
+}
+
