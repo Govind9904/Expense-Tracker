@@ -191,6 +191,8 @@ exports.getTotalYearly = async (req, res) => {
   }
 };
 
+// ------ Report Page ------
+
 // ------- Get Year Total Expense for Report Page -------
 exports.getYearlyTotalforReport = async (req, res) => {
   try {
@@ -282,6 +284,8 @@ exports.getSelectedMonthDataforChart = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// ------ Date Chart ----- 
 
 exports.getSelectedDateDateforChart = async (req,res) =>{
   try {

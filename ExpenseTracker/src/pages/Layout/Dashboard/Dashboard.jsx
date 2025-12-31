@@ -63,14 +63,12 @@ export default function Dashboard() {
   };
 
   // Start of current month
-  const startDate = new Date(currentDate.year, currentDate.month, 1)
-    .toISOString()
-    .split("T")[0];
+  const startDate = new Date(currentDate.year, currentDate.month, 1);
+  startDate.setHours(0, 0, 0, 0);
 
   // End of current month
-  const endDate = new Date(currentDate.year, currentDate.month + 1, 0)
-    .toISOString()
-    .split("T")[0];
+  const endDate = new Date(currentDate.year, currentDate.month + 1, 0);
+  endDate.setHours(23, 59, 59, 999);
 
   useEffect(() => {
     if (showMsg) {
@@ -106,6 +104,7 @@ export default function Dashboard() {
         }
       )
       .then((res) => {
+        console.log(res)
         setMonthly_Expense(res.data.monthly_TotalExpense);
       })
       .catch((err) => {
@@ -364,7 +363,7 @@ export default function Dashboard() {
         setUserExpense((prevExpenses) => [res.data.expense, ...prevExpenses]);
         getExpenseList();
         getExpenseAndCategories();
-
+        getGraphData();
         // Auto close modal
         closeModal();
         // Reset form
@@ -577,7 +576,7 @@ useEffect(() => {
                 <tr key={expense.id}>
                   <td>{new Date(expense.date).toLocaleDateString()}</td>
                   <td>{expense.description}</td>
-                  <td>{expense?.Category?.name}</td>
+                  <td>{expense?.category?.name}</td>
                   <td>₹{expense.amount}</td>
                   <td>{expense.payment_mode}</td>
                 </tr>
