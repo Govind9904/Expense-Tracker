@@ -1,5 +1,5 @@
 const { User, Category } = require("../Models");
-const { Op } = require("sequelize");
+const { Op, fn, col } = require("sequelize");
 const Expense = require("../Models/Expense");
 // const { parse } = require("dotenv");
 
@@ -51,8 +51,12 @@ exports.getExpensesList = async (req, res) => {
         date: { [Op.between]: [new Date(startDate), new Date(endDate)] },
       },
       include: [
-        { model: User, attributes: ["id", "first_name", "last_name"] },
-        { model: Category, attributes: ["id", "name"] },
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "first_name", "last_name"],
+        },
+        { model: Category, as: "category", attributes: ["id", "name"] },
       ],
       limit,
       offset,
@@ -71,7 +75,6 @@ exports.getExpensesList = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 // GraphData Api
 exports.getGraphData = async (req, res) => {
@@ -187,3 +190,144 @@ exports.getTotalYearly = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// ------- Get Year Total Expense for Report Page -------
+exports.getYearlyTotalforReport = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { year } = req.body;
+
+    if (!year) {
+      return res.status(400).json({ message: "year is required" });
+    }
+
+    const totalyear = Number(year);
+
+    const startDate = new Date(totalyear, 0, 1);
+    const endDate = new Date(totalyear, 11, 31, 23, 59, 59);
+
+    const data = await Expense.findAll({
+      attributes: [
+        [col("category.name"), "category"],
+        [fn("SUM", col("Expense.amount")), "total"],
+      ],
+      include: [
+        {
+          model: Category,
+          as: "category",
+          attributes: [],
+        },
+      ],
+      where: {
+        userId,
+        date: { [Op.between]: [startDate, endDate] },
+      },
+      group: ["category.name"],
+      raw: true,
+    });
+
+    return res.status(200).json({
+      success: true,
+      year,
+      data,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// -------- Get Selected Month Data for Pie Chart ------------
+
+exports.getSelectedMonthDataforChart = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { month, year } = req.body;
+
+    if (!month || !year) {
+      return res.status(400).json({ message: "month and year are required" });
+    }
+
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0, 23, 59, 59);
+
+    const data = await Expense.findAll({
+      attributes: [
+        [col("category.name"), "category"],
+        [fn("SUM", col("Expense.amount")), "total"],
+      ],
+      include: [
+        {
+          model: Category,
+          as: "category",
+          attributes: [],
+        },
+      ],
+      where: {
+        userId,
+        date: { [Op.between]: [startDate, endDate] },
+      },
+      group: ["category.name"],
+      raw: true,
+    });
+
+    return res.status(200).json({
+      success: true,
+      month,
+      year,
+      data,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getSelectedDateDateforChart = async (req,res) =>{
+  try {
+  const userId = req.user.id;
+  const { startDate, endDate } = req.body;
+
+  if (!startDate || !endDate) {
+    return res
+      .status(400)
+      .json({ message: "startDate and endDate are required" });
+  }
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+
+  const data = await Expense.findAll({
+    attributes: [
+      [col("category.name"), "category"],
+      [fn("SUM", col("Expense.amount")), "total"],
+    ],
+    include: [
+      {
+        model: Category,
+        as: "category",
+        attributes: [],
+      },
+    ],
+    where: {
+      userId,
+      date: { [Op.between]: [start, end] },
+    },
+    group: ["category.name"],
+    raw: true,
+  });
+
+  return res.status(200).json({
+    success: true,
+    startDate,
+    endDate,
+    data,
+  });
+  } catch (err) {
+  console.error("Date range report error:", err);
+  res.status(500).json({ error: err.message });
+  }
+}
