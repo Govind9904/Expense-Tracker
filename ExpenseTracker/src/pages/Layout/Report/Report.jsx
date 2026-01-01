@@ -18,6 +18,7 @@ export default function Reports() {
   const [charData, setChartData] = useState([]);
   const [category,setCategory] = useState([]);
   const [filterCategory,setFilterCategory] = useState("All");
+  const [overallTotal,setOverAllTotal] = useState(0);
   const token = localStorage.getItem("token");
 
   const navigate = useNavigate();
@@ -55,7 +56,8 @@ export default function Reports() {
    
     axios.post("http://127.0.0.1:3000/api/report/expense/year",
     {
-       "year" : year.getFullYear()
+       "year" : year.getFullYear(),
+       "filterCategory" : filterCategory
     },
     {
        headers : {
@@ -64,6 +66,7 @@ export default function Reports() {
     })
     .then((res)=>{
       setChartData(res.data.data);
+      setOverAllTotal(res.data.overallTotal);
     })
     .catch((err)=>{
       console.log(err);
@@ -77,7 +80,7 @@ export default function Reports() {
       {
         "month" : month.getMonth() + 1,
         "year" : month.getFullYear(),
-        "categoryFilter" : filterCategory
+        "filterCategory" : filterCategory
       },
       {
         headers : {
@@ -86,40 +89,24 @@ export default function Reports() {
       })
       .then((res)=>{
         setChartData(res.data.data);
+        setOverAllTotal(res.data.overallTotal);
       }).catch((err)=>{
         console.log(err);
       })
   }
 
-  const pieData = {
-    labels  : charData.map((item) => item.category),
-    datasets : [
-      {
-        label: "Monthly Expenses",
-        data: charData.map((item) => item.total),
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#8AFF33",
-          "#FF33F6",
-          "#33FFF3",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  }
-
+  
   const getPieChartDataforDate = () =>{
-   axios.post("http://127.0.0.1:3000/api/report/expense/date",
-    {
+    axios.post("http://127.0.0.1:3000/api/report/expense/date",
+      {
         startDate,
-        endDate
-    },
-    {
-       headers : {
-        Authorization : `Bearer ${token}`
-       }
+        endDate,
+        "filterCategory" : filterCategory
+      },
+      {
+        headers : {
+          Authorization : `Bearer ${token}`
+        }
     })
     .then((res)=>{
       setChartData(res.data.data);
@@ -151,7 +138,8 @@ export default function Reports() {
    axios.post("http://127.0.0.1:3000/api/report/expense/month",
     {
         month,
-        year
+        year,
+        "filterCategory" : filterCategory
     },
     {
        headers : {
@@ -160,6 +148,7 @@ export default function Reports() {
     })
     .then((res)=>{
       setChartData(res.data.data);
+      setOverAllTotal(res.data.overallTotal);
     })
     .catch((err)=>{
       if(err.status === 403){
@@ -169,9 +158,9 @@ export default function Reports() {
       }
     })
   }
-
+  
   // ---- for Last Six Month ---- 
-
+  
   const getLastSixMonth = () => {
     const today = new Date();
 
@@ -194,15 +183,17 @@ export default function Reports() {
     axios.post("http://127.0.0.1:3000/api/report/expense/date",
     {
         startDate,
-        endDate
+        endDate,
+        "filterCategory" : filterCategory
     },
     {
        headers : {
         Authorization : `Bearer ${token}`
        }
-    })
-    .then((res)=>{
+      })
+      .then((res)=>{
       setChartData(res.data.data);
+      setOverAllTotal(res.data.overallTotal);
     })
     .catch((err)=>{
       console.log(err);
@@ -226,22 +217,22 @@ export default function Reports() {
 
     axios.post("http://127.0.0.1:3000/api/report/expense/year",
     {
-       "year" : last_year
+      "year" : last_year,
+      "filterCategory" : filterCategory
     },
     {
        headers : {
         Authorization : `Bearer ${token}`
        }
-    })
-    .then((res)=>{
-      setChartData(res.data.data);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-  }
-
-
+      })
+      .then((res)=>{
+        setChartData(res.data.data);
+        setOverAllTotal(Number(res.data.overallTotal) || 0);
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+    }
 
   useEffect(() => {
     if (filter === "year") {
@@ -259,32 +250,81 @@ export default function Reports() {
     if(filter === "previousMonth"){
       getPieChartDataforPreviousMonth();
     }
-
+    
     if(filter === "sixMonth"){
       getPieChartDataforLastSixMonth();
     }
-
+    
     if(filter === "lastYear"){
       getPieChartDataforLastYear();
     }
-  }, [filter, year, month, startDate,endDate]);
+  }, [filter, year, month, startDate,endDate,filterCategory]);
+  
+  
+    // 1️⃣ normalize totals (API-safe)
+    const overallTotalSafe = Number(overallTotal) || 0;
 
-  useEffect(()=>{
-    if(filter === "month" || filterCategory){
-    getPieChartDataforMonth(); 
+    // calculate filtered total only when a category is selected
+    const filteredTotal =
+      filterCategory === "All"
+        ? 0
+        : charData.reduce(
+            (acc, item) => acc + Number(item.total || 0),
+            0
+          );
+
+    // remaining amount
+    const remainingTotal = Math.max(
+      overallTotalSafe - filteredTotal,
+      0
+    );
+
+
+    // 2️⃣ base pie data (All categories)
+    const pieData = {
+      labels: charData.map((item) => item.category),
+      data: charData.map((item) => Number(item.total) || 0),
+      colors: [
+        "#FF6384",
+        "#36A2EB",
+        "#FFCE56",
+        "#8AFF33",
+        "#FF33F6",
+        "#33FFF3",
+      ],
+    };
+
+    // 3️⃣ dynamic chart values
+    let chartSeries = [];
+    let chartLabels = [];
+    let chartColors = [];
+
+    if (filterCategory === "All") {
+      chartSeries = pieData.data;
+      chartLabels = pieData.labels;
+      chartColors = pieData.colors;
+    } else if (filteredTotal > 0) {
+      chartSeries = [filteredTotal, remainingTotal];
+      chartLabels = [filterCategory, "Other Expenses"];
+      chartColors = ["#36A2EB", "#E0E0E0"];
     }
-  },[filterCategory]);
-
-  const chartOptions = {
-  labels: pieData.labels, // categories
-  colors: pieData.datasets[0].backgroundColor, // colors
-  legend: { position: "bottom" },
-  dataLabels: {
-    enabled: true
+    else if (filteredTotal === 0) {
+      chartSeries = [filteredTotal, remainingTotal];
+      chartLabels = [filterCategory, "Other Expenses"];
+      chartColors = ["#36A2EB", "#E0E0E0"];
     }
-  };
 
-  const chartSeries = pieData.datasets[0].data; // totals
+    // 4️⃣ chart options (ApexCharts)
+    const chartOptions = {
+      labels: chartLabels,
+      colors: chartColors,
+      legend: { position: "bottom" },
+      dataLabels: {
+        enabled: true,
+        formatter: (val) => `${val.toFixed(2)}%`,
+      },
+    };
+
 
   return (
     <>
@@ -355,30 +395,32 @@ export default function Reports() {
         </div>
       </div>
     </div>
-
-    <div>
-      <label htmlFor="">filetr by category : </label>
-      <select onChange={(e)=>setFilterCategory(e.target.value)}>
-        <option value="All">All Category</option>
-        {category.map((item) => (
-          <option key={item.id} value={item.name}>
-            {item.name}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    <div style={{ width: "500px" , alignItems : "start", height : "500px", maxWidth : "700px" , maxHeight : "700px" }}>
-      {charData.length === 0 ? (
-        <p>No data to display</p>
-      ) : (
-        <Chart
-          options={chartOptions}
-          series={chartSeries}
-          type="pie"
-          width="100%"
-        />
-      )}
+          
+    <div className="charts">
+      <div>
+        <label htmlFor="">Category : </label>
+        <select className="categorySelector" onChange={(e)=>setFilterCategory(e.target.value)}>
+          <option value="All">All Category</option>
+          {category.map((item) => (
+            <option key={item.id} value={item.name}>
+              {item.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      
+      <div className="pieChart">
+        <div style={{ width: "300px" , alignItems : "start", height : "300px", maxWidth : "500px" , maxHeight : "500px" }}>
+          {chartSeries.length > 0 && (
+            <Chart
+              type="pie"
+              series={chartSeries}
+              options={chartOptions}
+              height="100%"
+            />
+          )}
+        </div>
+      </div>
     </div>
     </>
   );

@@ -5,7 +5,7 @@ import Register from "./pages/Register/Register";
 import Dashboard from "./pages/Layout/Dashboard/Dashboard";
 import Layout from "./pages/Layout/Layout";
 import Report from "./pages/Layout/Report/Report";
-import Profile from "./pages/Profile/Profile";
+import Profile from "./pages/Layout/Profile/Profile";
 
 export default function App() {
   return (
