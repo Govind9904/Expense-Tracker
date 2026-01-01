@@ -298,36 +298,40 @@ export default function Dashboard() {
       dayTotals[day - 1] += expense.amount;
     }
   });
-  const chartSeries = [
-    {
-      name: "Expenses by Day",
-      data: dayTotals,
-      color : "#1fa2ff"
-    },
-  ];
-
-  const chartOptions = {
-    chart: {
-      type: "bar",
-      toolbar: { show: false },
-    },
-    xaxis: {
-      categories: dayLabels,
-    },
-    plotOptions: {
-      bar: {
-        borderRadius: 4,
-        columnWidth: "70%",
+    const chartSeries = [
+      {
+        name: "Expenses by Day",
+        data: dayTotals,
       },
-    },
-    colors: ["#1fa2ff"],
-    dataLabels: { enabled: false },
-    tooltip: { enabled: true },
-    title: {
-      text: `Expenses by Day (${monthNames[currentMonth]} ${currentYear})`,
-      align: "center",
-    },
-  };
+    ];
+
+    const chartOptions = {
+      chart: {
+        type: "bar",
+        toolbar: { show: false },
+      },
+      xaxis: {
+        categories: dayLabels,
+     },
+      plotOptions: {
+        bar: {
+          borderRadius: 4,
+          columnWidth: "70%",
+        },
+      },
+      colors: ["#1fa2ff"],
+      dataLabels: { enabled: false },
+      tooltip: { enabled: true },
+      title: {
+        text: `Expenses by Day (${monthNames[currentMonth]} ${currentYear})`,
+        align: "center",
+        style : {
+          color: "#ffffffff",   
+          fontSize: "16px",
+          fontWeight: "600",
+        }
+      },
+    };
 
   // Expense form change handler
   const handleChnageExpense = (e) => {
@@ -519,7 +523,7 @@ useEffect(() => {
         <div className="dashboard-expense-list">
           <div className="expense-list-header">
             <div className="expense-list-title">Latest Expense</div>
-            <div className="list-icon">
+            {/* <div className="list-icon">
               <button onClick={() => handleList("Back")} disabled={listPage === 1}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -554,7 +558,7 @@ useEffect(() => {
                   <path d="m12 5 7 7-7 7" />
                 </svg>
               </button>
-            </div>
+            </div> */}
           </div>
           <table className="expense-table">
             <thead>
