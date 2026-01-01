@@ -4,6 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 // For chart rendering
 import Chart from "react-apexcharts";
+import { color } from "chart.js/helpers";
 
 export default function Dashboard() {
   const [userExpense, setUserExpense] = useState([]);
@@ -301,21 +302,22 @@ export default function Dashboard() {
     {
       name: "Expenses by Day",
       data: dayTotals,
+      color : "#1fa2ff"
     },
   ];
 
   const chartOptions = {
     chart: {
       type: "bar",
-      toolbar: { show: true },
+      toolbar: { show: false },
     },
     xaxis: {
       categories: dayLabels,
     },
     plotOptions: {
       bar: {
-        borderRadius: 2,
-        columnWidth: "90%",
+        borderRadius: 4,
+        columnWidth: "70%",
       },
     },
     colors: ["#1fa2ff"],
@@ -440,50 +442,43 @@ useEffect(() => {
 
         {/* Cards */}
         <div className="dashboard-cards">
+         
           <div className="dashboard-card">
-            <div className="card-label">Total Expense(Year)</div>
+            <div className="card-label">Today Expense</div>
             <div className="card-value">
-              {"\u20B9"} {Total_Expense}
+              {"\u20B9"} {Monthly_Expense}
             </div>
           </div>
+
           <div className="dashboard-card">
             <div className="card-label">Monthly Expense</div>
             <div className="card-value">
               {"\u20B9"} {Monthly_Expense}
             </div>
           </div>
+
+          <div className="dashboard-card">
+            <div className="card-label">Total Expense(Year)</div>
+            <div className="card-value">
+              {"\u20B9"} {Total_Expense}
+            </div>
+          </div>
+
         </div>
         {/* Expense Graph */}
-        <div
-          className="dashboard-graph"
-          style={{
-            background: "#fff",
-            borderRadius: 16,
-            padding: 15,
-            marginBottom: 32,
-            boxShadow: "0 2px 12px rgba(18,216,250,0.10)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              gap: "2px",
-              alignItems: "flex-end",
-              marginBottom: 10,
-            }}
-          >
+        <div className="dashboard-graph">
+          {/* <div className="graph-back-next-btn">
             <button
               className="graph-nav-btn"
               onClick={() => handleClickon("Back")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="28"
-                height="28"
+                width="22"
+                height="22"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#e70808"
+                stroke="#1fa2ff"
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -499,11 +494,11 @@ useEffect(() => {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="28"
-                height="28"
+                width="22"
+                height="22"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#e70808"
+                stroke="#1fa2ff"
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -512,7 +507,7 @@ useEffect(() => {
                 <path d="m9 18 6-6-6-6" />
               </svg>
             </button>
-          </div>
+          </div> */}
           <Chart
             type="bar"
             options={chartOptions}
@@ -532,7 +527,7 @@ useEffect(() => {
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#000000"
+                  stroke="#1fa2ff"
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -549,7 +544,7 @@ useEffect(() => {
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#000000"
+                  stroke="#1fa2ff"
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"

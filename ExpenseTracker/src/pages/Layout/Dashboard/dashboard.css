@@ -84,6 +84,14 @@ body,
   border: 1.5px solid rgba(255, 255, 255, 0.06);
 }
 
+.graph-back-next-btn{
+  display: flex;
+  justify-content: flex-start;
+  gap: 2px;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
 .dashboard-expense-list {
   background: rgba(36, 38, 58, 0.92);
   border-radius: 18px;
@@ -92,6 +100,10 @@ body,
   margin-top: 0;
   overflow-x: auto;
   border: 1.5px solid rgba(255, 255, 255, 0.06);
+}
+
+.graph-nav-btn{
+  padding: 2px;
 }
 
 .expense-list-header {
