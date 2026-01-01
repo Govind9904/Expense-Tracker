@@ -197,7 +197,7 @@ exports.getTotalYearly = async (req, res) => {
 exports.getYearlyTotalforReport = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { year } = req.body;
+    const { year , filterCategory } = req.body;
 
     if (!year) {
       return res.status(400).json({ message: "year is required" });
@@ -208,18 +208,35 @@ exports.getYearlyTotalforReport = async (req, res) => {
     const startDate = new Date(totalyear, 0, 1);
     const endDate = new Date(totalyear, 11, 31, 23, 59, 59);
 
+
+    const overallTotal = await Expense.sum("amount", {
+      where: {
+        userId,
+        date: { [Op.between]: [startDate, endDate] },
+      },
+    });
+
+    // ✅ correct include
+    const categoryInclude = {
+      model: Category,
+      as: "category",
+      attributes: [],
+      required: true, // 🔥 MUST
+    };
+
+    // ✅ apply filter correctly
+    if (filterCategory && filterCategory !== "All") {
+      categoryInclude.where = {
+        name: filterCategory,
+      };
+    }
+
     const data = await Expense.findAll({
       attributes: [
         [col("category.name"), "category"],
         [fn("SUM", col("Expense.amount")), "total"],
       ],
-      include: [
-        {
-          model: Category,
-          as: "category",
-          attributes: [],
-        },
-      ],
+      include: [categoryInclude],
       where: {
         userId,
         date: { [Op.between]: [startDate, endDate] },
@@ -232,6 +249,7 @@ exports.getYearlyTotalforReport = async (req, res) => {
       success: true,
       year,
       data,
+      overallTotal
     });
   } catch (err) {
     console.error(err);
@@ -252,6 +270,13 @@ exports.getSelectedMonthDataforChart = async (req, res) => {
 
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59);
+
+    const overallTotal = await Expense.sum("amount", {
+      where: {
+        userId,
+        date: { [Op.between]: [startDate, endDate] },
+      },
+    });
 
     // ✅ correct include
     const categoryInclude = {
@@ -288,6 +313,7 @@ exports.getSelectedMonthDataforChart = async (req, res) => {
       year,
       filterCategory,
       data,
+      overallTotal
     });
   } catch (err) {
     console.error(err);
@@ -300,7 +326,7 @@ exports.getSelectedMonthDataforChart = async (req, res) => {
 exports.getSelectedDateDateforChart = async (req,res) =>{
   try {
   const userId = req.user.id;
-  const { startDate, endDate } = req.body;
+  const { startDate, endDate , filterCategory } = req.body;
 
   if (!startDate || !endDate) {
     return res
@@ -314,26 +340,34 @@ exports.getSelectedDateDateforChart = async (req,res) =>{
   start.setHours(0, 0, 0, 0);
   end.setHours(23, 59, 59, 999);
 
-  const categoryInclude = [
-    {
-        model: Category,
-        as: "category",
-        attributes: [],
-        require : true
-      },
-  ]
+  const overallTotal = await Expense.sum("amount", {
+    where: {
+      userId,
+      date: { [Op.between]: [start, end] },
+    },
+  });
 
-  // ✅ apply category filter ONLY if not "All"
-    if (filterCategory && filterCategory !== "All") {
-      categoryInclude.where = { name: filterCategory };
-    }
+  // ✅ correct include
+  const categoryInclude = {
+    model: Category,
+    as: "category",
+    attributes: [],
+    required: true, // 🔥 MUST
+  };
+
+  // ✅ apply filter correctly
+  if (filterCategory && filterCategory !== "All") {
+    categoryInclude.where = {
+      name: filterCategory,
+    };
+  }
 
   const data = await Expense.findAll({
     attributes: [
       [col("category.name"), "category"],
       [fn("SUM", col("Expense.amount")), "total"],
     ],
-    include:categoryInclude,
+    include:[categoryInclude],
     where: {
       userId,
       date: { [Op.between]: [start, end] },
@@ -347,6 +381,7 @@ exports.getSelectedDateDateforChart = async (req,res) =>{
     startDate,
     endDate,
     data,
+    overallTotal
   });
   } catch (err) {
   console.error("Date range report error:", err);
