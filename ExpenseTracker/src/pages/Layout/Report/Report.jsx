@@ -16,15 +16,39 @@ export default function Reports() {
   const [endDate, setEndDate] = useState(today);
 
   const [charData, setChartData] = useState([]);
-
+  const [category,setCategory] = useState([]);
+  const [filterCategory,setFilterCategory] = useState("All");
   const token = localStorage.getItem("token");
 
   const navigate = useNavigate();
 
+  
+  
+  const getCategories = () => {
+    axios
+    .post(
+      "http://127.0.0.1:3000/api/categories",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    .then((res) => {
+      setCategory(res.data?.categories);
+    })
+    .catch((err) => {
+      console.error("Error fetching categories:", err);
+    });
+  }
+  
   useEffect(()=>{
     if (!token) {
       navigate("/");
     }
+
+    getCategories();
   },[]);
 
   const getPieChartDataforYear = () =>{
@@ -52,7 +76,8 @@ export default function Reports() {
     axios.post("http://127.0.0.1:3000/api/report/expense/month",
       {
         "month" : month.getMonth() + 1,
-        "year" : month.getFullYear()
+        "year" : month.getFullYear(),
+        "categoryFilter" : filterCategory
       },
       {
         headers : {
@@ -244,6 +269,12 @@ export default function Reports() {
     }
   }, [filter, year, month, startDate,endDate]);
 
+  useEffect(()=>{
+    if(filter === "month" || filterCategory){
+    getPieChartDataforMonth(); 
+    }
+  },[filterCategory]);
+
   const chartOptions = {
   labels: pieData.labels, // categories
   colors: pieData.datasets[0].backgroundColor, // colors
@@ -323,6 +354,18 @@ export default function Reports() {
 
         </div>
       </div>
+    </div>
+
+    <div>
+      <label htmlFor="">filetr by category : </label>
+      <select onChange={(e)=>setFilterCategory(e.target.value)}>
+        <option value="All">All Category</option>
+        {category.map((item) => (
+          <option key={item.id} value={item.name}>
+            {item.name}
+          </option>
+        ))}
+      </select>
     </div>
 
     <div style={{ width: "500px" , alignItems : "start", height : "500px", maxWidth : "700px" , maxHeight : "700px" }}>

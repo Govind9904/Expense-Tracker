@@ -244,7 +244,7 @@ exports.getYearlyTotalforReport = async (req, res) => {
 exports.getSelectedMonthDataforChart = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { month, year } = req.body;
+    const { month, year, filterCategory } = req.body;
 
     if (!month || !year) {
       return res.status(400).json({ message: "month and year are required" });
@@ -253,18 +253,27 @@ exports.getSelectedMonthDataforChart = async (req, res) => {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0, 23, 59, 59);
 
+    // ✅ correct include
+    const categoryInclude = {
+      model: Category,
+      as: "category",
+      attributes: [],
+      required: true, // 🔥 MUST
+    };
+
+    // ✅ apply filter correctly
+    if (filterCategory && filterCategory !== "All") {
+      categoryInclude.where = {
+        name: filterCategory,
+      };
+    }
+
     const data = await Expense.findAll({
       attributes: [
         [col("category.name"), "category"],
         [fn("SUM", col("Expense.amount")), "total"],
       ],
-      include: [
-        {
-          model: Category,
-          as: "category",
-          attributes: [],
-        },
-      ],
+      include: [categoryInclude],
       where: {
         userId,
         date: { [Op.between]: [startDate, endDate] },
@@ -277,6 +286,7 @@ exports.getSelectedMonthDataforChart = async (req, res) => {
       success: true,
       month,
       year,
+      filterCategory,
       data,
     });
   } catch (err) {
@@ -304,18 +314,26 @@ exports.getSelectedDateDateforChart = async (req,res) =>{
   start.setHours(0, 0, 0, 0);
   end.setHours(23, 59, 59, 999);
 
+  const categoryInclude = [
+    {
+        model: Category,
+        as: "category",
+        attributes: [],
+        require : true
+      },
+  ]
+
+  // ✅ apply category filter ONLY if not "All"
+    if (filterCategory && filterCategory !== "All") {
+      categoryInclude.where = { name: filterCategory };
+    }
+
   const data = await Expense.findAll({
     attributes: [
       [col("category.name"), "category"],
       [fn("SUM", col("Expense.amount")), "total"],
     ],
-    include: [
-      {
-        model: Category,
-        as: "category",
-        attributes: [],
-      },
-    ],
+    include:categoryInclude,
     where: {
       userId,
       date: { [Op.between]: [start, end] },
