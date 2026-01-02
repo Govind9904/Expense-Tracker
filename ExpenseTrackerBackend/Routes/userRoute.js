@@ -13,6 +13,8 @@ router.post("/categories",authenticateToken,CategoryController.getAllCategories)
 
 // Expense Routes
 
+// Today Expense 
+router.post("/today/expense",authenticateToken,ExpenseController.getTodayExpense);
 // Paginated Expense
 router.post("/expenses", authenticateToken, ExpenseController.getExpensesList);
 
@@ -28,7 +30,7 @@ router.post("/expense/year",authenticateToken,ExpenseController.getTotalYearly);
 // add Expense
 router.post("/add/expense", authenticateToken, ExpenseController.createExpense);
 
-// router.post('/expenses/monthly',authenticateToken,ExpenseController.getTotalExpensebyDate);
+router.post('/expenses/monthly',authenticateToken,ExpenseController.getMonthlyDataforYear);
 
 router.post("/report/expense/year",authenticateToken,ExpenseController.getYearlyTotalforReport);
 router.post("/report/expense/month",authenticateToken,ExpenseController.getSelectedMonthDataforChart);

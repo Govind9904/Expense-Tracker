@@ -5,6 +5,9 @@ import "./Report.css";
 import Chart from "react-apexcharts";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import styled from "@emotion/styled";
+import { color } from "chart.js/helpers";
+import { colors } from "@mui/material";
 
 export default function Reports() {
   const [filter, setFilter] = useState("month");
@@ -20,6 +23,10 @@ export default function Reports() {
   const [filterCategory,setFilterCategory] = useState("All");
   const [overallTotal,setOverAllTotal] = useState(0);
   const token = localStorage.getItem("token");
+
+  const [lineChartYear,setLineChartYear] = useState(today);
+  const [lineChartData, setLineChartData] = useState([]);
+  const [lineChartSeries, setLineChartSeries] = useState([]);
 
   const navigate = useNavigate();
 
@@ -50,6 +57,7 @@ export default function Reports() {
     }
 
     getCategories();
+    getDataforLineChart();
   },[]);
 
   const getPieChartDataforYear = () =>{
@@ -326,6 +334,87 @@ export default function Reports() {
     };
 
 
+    // --------------------------- Line Chart -----------------------------
+
+    const getDataforLineChart = () => {
+      axios.post("http://127.0.0.1:3000/api/expenses/monthly",
+        {
+          "year" : lineChartYear.getFullYear()
+        },
+        {
+          headers : {
+            Authorization : `Bearer ${token}`
+          }
+        }
+      ).then((res)=>{
+        setLineChartData(res.data.monthlyExpenses || []);
+      }).catch((err)=>{
+        console.log(err);
+      })
+    }
+
+    useEffect(() => {
+      getDataforLineChart();
+    }, [lineChartYear]);
+
+    useEffect(() => {
+      if (lineChartData.length === 0) {
+        setLineChartSeries([
+          {
+            name: "Monthly Expense",
+            data: Array(12).fill(0),
+          },
+        ]);
+        return;
+      }
+
+      const monthlyTotals = Array(12).fill(0);
+
+      lineChartData.forEach((item) => {
+        monthlyTotals[item.month - 1] = Number(item.total);
+      });
+
+      setLineChartSeries([
+        {
+          name: "Expense",
+          data: monthlyTotals,
+        },
+      ]);
+    }, [lineChartData]);
+
+    // --- Line Chart Data ----
+
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+   const lineChartOptions = {
+      chart: {
+        type: "line",
+        toolbar: { show: false },
+         foreColor: "#ffffff", 
+      },
+      stroke: {
+        curve: "smooth",
+        width: 2,
+      },
+      markers: {
+        size: 2,
+      },
+      xaxis: {
+        categories: monthNames,
+      },
+      tooltip: {
+        theme: "light",
+        y: {
+          formatter: (val) => `₹ ${val}`,
+          
+        },
+      },
+      colors: ["#FF6702"],
+    };
+
   return (
     <>
     <div className="report-header">
@@ -422,6 +511,17 @@ export default function Reports() {
         </div>
       </div>
     </div>
+      {/* Line Chart  */}
+      
+      <div>
+        <Chart
+          options={lineChartOptions}
+          series={lineChartSeries}
+          type="line"
+          height={320}
+          width={800}
+        />
+      </div>
     </>
   );
 }

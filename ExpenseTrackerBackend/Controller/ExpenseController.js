@@ -1,6 +1,7 @@
 const { User, Category } = require("../Models");
 const { Op, fn, col } = require("sequelize");
 const Expense = require("../Models/Expense");
+const sequelize = require("../Database/db");
 // const { parse } = require("dotenv");
 
 exports.createExpense = async (req, res) => {
@@ -26,6 +27,37 @@ exports.createExpense = async (req, res) => {
     res.status(500).json({ error: err });
   }
 };
+
+exports.getTodayExpense = async (req,res) => {
+  try{
+      const userId = req.user.id;
+
+      // Start of today
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+
+      // End of today
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+      
+      const todayExpense = await Expense.sum("amount",{
+        where : {
+          userId,
+          date : {
+            [Op.between]: [startOfDay, endOfDay],
+          }
+        }
+      });
+
+      return res.status(200).json({
+        todayExpense : todayExpense || 0,
+      })
+    }catch(err){
+      return res.status(500).json({
+        error : err
+      })
+    }
+}
 
 // Get Paginated Expesne List
 exports.getExpensesList = async (req, res) => {
@@ -388,3 +420,33 @@ exports.getSelectedDateDateforChart = async (req,res) =>{
   res.status(500).json({ error: err.message });
   }
 }
+
+// ---- Get MonthlyData for Line Chart -----
+
+exports.getMonthlyDataforYear = async (req,res) => {
+  try{
+  const userId = req.user.id;
+    const { year }  = req.body;
+
+    const monthlyExpenses = await Expense.findAll({
+      attributes : [
+        [sequelize.fn("MONTH" , sequelize.col("date")),"month"],
+        [sequelize.fn("SUM" , sequelize.col("amount")), "total"],
+      ],
+      where : {
+        userId,
+        date :{
+          [Op.between] :[
+            new Date(year,0, 1),
+            new Date(year, 11, 31, 23, 59, 59),
+          ],
+        },
+      },
+      group :["month"],
+      order :[[sequelize.literal("month"),"ASC"]],
+    });
+    return res.status(200).json({ monthlyExpenses });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+} 

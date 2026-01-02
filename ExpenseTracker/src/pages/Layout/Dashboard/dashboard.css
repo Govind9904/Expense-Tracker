@@ -59,10 +59,35 @@ body,
   border: 1.5px solid rgba(255, 255, 255, 0.06);
 }
 
-.card-label {
-  font-size: 1.08rem;
+.dashboard-card-label{
   color: #1fa2ff;
-  margin-bottom: 8px;
+  border-bottom: 1px solid #1fa2ff;
+  border-radius: 3px;
+  padding:10px 0 10px 10px;
+  min-width: 100%;
+  font-weight: 700;
+}
+
+.dashboard-card-all{
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  margin: 15px 0px;
+}
+
+.dashboard-card-expense{
+  background: rgba(36, 38, 58, 0.92);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(31, 162, 255, 0.1);
+  padding: 5px 0;
+  min-width: 220px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.06);
+  margin: 25px 0;
 }
 
 .card-value {
@@ -70,7 +95,13 @@ body,
   font-weight: 700;
   color: #fff;
 }
+.apexcharts-tooltip {
+  color: #1fa2ff !important;   /* tooltip text color */
+}
 
+.apexcharts-tooltip-title {
+  color: #1fa2ff !important;   /* tooltip title */
+}
 .dashboard-graph {
   background: rgba(36, 38, 58, 0.92);
   border-radius: 18px;
@@ -149,7 +180,7 @@ body,
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 12px 32px;
+  padding: 12px 20px;
   font-size: 1.08rem;
   font-weight: 600;
   cursor: pointer;
@@ -160,6 +191,12 @@ body,
 
 .add-expense-btn:hover {
   background: #1fa2ff;
+}
+
+.quick-access{
+  width: 20px;
+  height: 20px;
+  margin: auto;
 }
 
 /* Responsive styles */
@@ -202,7 +239,7 @@ body,
     gap: 6px;
   }
   .dashboard-card {
-    padding: 10px 4px;
+    padding:2px 10px;
     font-size: 0.92rem;
   }
   .dashboard-graph {

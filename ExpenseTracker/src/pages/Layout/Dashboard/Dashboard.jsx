@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import "./dashboard.css";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // For chart rendering
 import Chart from "react-apexcharts";
-import { color } from "chart.js/helpers";
+import spendingImg  from "../../../assets/spending.png"
+import categories from "../../../assets/categories.png"
+import report from "../../../assets/report.png"
 
 export default function Dashboard() {
   const [userExpense, setUserExpense] = useState([]);
   const [showMsg, setShowMsg] = useState(false);
   const [hide, setHide] = useState(false);
   const [error, setError] = useState("");
+  const [todayExpense, setTodayExpense] = useState(0);
   const [Monthly_Expense, setMonthly_Expense] = useState(0);
   const [Total_Expense, setTotal_Expense] = useState(0);
   const [graphData, setGraphData] = useState([]);
@@ -24,6 +27,11 @@ export default function Dashboard() {
   const [currentDate, setCurrentDate] = useState({
     month: new Date().getMonth(), // 0-11   
     year: new Date().getFullYear(),
+  });
+
+  // Category Form State
+  const [categoryForm, setCategoryForm] = useState({
+    categoryName: "",
   });
 
   // Expense form state
@@ -82,11 +90,12 @@ export default function Dashboard() {
   }, [showMsg]);
 
   const token = localStorage.getItem("token");
-  // console.log("Token in Dashboard:", token);
 
   if (!token) {
     navigate("/");
   }
+
+  // Get Categories
 
   const getExpenseAndCategories = () => {
     axios
@@ -137,6 +146,24 @@ export default function Dashboard() {
         console.error("Error fetching categories:", err);
       });
   };
+
+  // Get Today Expense
+  const getTodayExpense = () =>{
+    axios.post("http://127.0.0.1:3000/api/today/expense",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          setTodayExpense(res.data.todayExpense);
+        })
+        .catch((err) => {
+          console.error("Error fetching categories:", err);
+        });
+  }
 
   // Graph Data && Total Monthly Expense API Fetch
 
@@ -255,12 +282,14 @@ export default function Dashboard() {
     getGraphData();
     getExpenseList();
     getYearTotal();
+    getTodayExpense();
   }, []);
 
   useEffect(() => {
     getExpenseAndCategories();
     getGraphData();
     getExpenseList();
+    getTodayExpense();
   }, [currentDate.month]);
 
   useEffect(() => {
@@ -300,7 +329,7 @@ export default function Dashboard() {
   });
     const chartSeries = [
       {
-        name: "Expenses by Day",
+        name: "Expense",
         data: dayTotals,
       },
     ];
@@ -312,7 +341,27 @@ export default function Dashboard() {
       },
       xaxis: {
         categories: dayLabels,
+        labels : {
+          style : {
+            colors: "#ffffff",   
+          }
+        }
      },
+      yaxis: {
+        labels: {
+          style: {
+            colors: "#ffffff",   
+            fontSize: "12px",
+          },
+        },
+      },
+      tooltip: {
+        theme: "light", 
+        style: {
+          fontSize: "12px",
+          color : "1fa2ff"
+        },
+      },
       plotOptions: {
         bar: {
           borderRadius: 4,
@@ -321,7 +370,7 @@ export default function Dashboard() {
       },
       colors: ["#1fa2ff"],
       dataLabels: { enabled: false },
-      tooltip: { enabled: true },
+      // tooltip: { enabled: true },
       title: {
         text: `Expenses by Day (${monthNames[currentMonth]} ${currentYear})`,
         align: "center",
@@ -370,6 +419,7 @@ export default function Dashboard() {
         getExpenseList();
         getExpenseAndCategories();
         getGraphData();
+        getTodayExpense();
         // Auto close modal
         closeModal();
         // Reset form
@@ -377,7 +427,7 @@ export default function Dashboard() {
           date: "",
           description: "",
           amount: "",
-          category_id: "",
+          categoryId: "",
           payment_mode: "",
         });
       })
@@ -392,6 +442,47 @@ export default function Dashboard() {
         }, 10);
       });
   };
+
+  // Category form Change Handler
+  const handleCategoryChange = (e) =>{
+     const { name , value } = e.target;
+     setCategoryForm((prev)=>({
+      ...prev,
+      [name] : value
+     }))
+  }
+
+  // Add Categort API
+  const handleCategorySubmit = () => {
+  axios
+    .post(
+      "http://127.0.0.1:3000/api/add/category",
+      categoryForm,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    .then((res) => {
+      // Refresh category list
+      setCategory((prev) => [...prev, res.data.category]);
+
+      // Reset form
+      setCategoryForm({ name: "" });
+
+      // Close modal
+      const modalEl = document.getElementById("addCategoryModal");
+      const modal = window.bootstrap.Modal.getInstance(modalEl);
+      modal.hide();
+    })
+    .catch((err) => {
+      setError(err.message || "Failed to add category");
+      setShowMsg(true);
+      console.log(err);
+    });
+};
+
 
 
   const handleList = (Page) => {
@@ -450,7 +541,7 @@ useEffect(() => {
           <div className="dashboard-card">
             <div className="card-label">Today Expense</div>
             <div className="card-value">
-              {"\u20B9"} {Monthly_Expense}
+              {"\u20B9"} {todayExpense}
             </div>
           </div>
 
@@ -519,6 +610,32 @@ useEffect(() => {
             height={280}
           />
         </div>
+
+        {/* Add Buttons for Expense */}
+        <div className="dashboard-card-expense">
+          <div className="dashboard-card-label">Quick Access</div>
+
+          <div className="dashboard-card-all">
+            <div className="">
+             <button className="add-expense-btn" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+               <img className="quick-access" src={spendingImg} alt="" /> New Expense
+              </button>
+            </div>
+            <div>
+             <button className="add-expense-btn" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+              <img className="quick-access" src={categories} alt="" />  Category
+              </button>
+            </div>
+            <div>
+              <Link to="/report">
+                <button className="add-expense-btn">
+                  <img className="quick-access" src={report} alt="" />  Report
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* Expense List */}
         <div className="dashboard-expense-list">
           <div className="expense-list-header">
@@ -582,13 +699,6 @@ useEffect(() => {
               ))}
             </tbody>
           </table>
-          <button
-            className="add-expense-btn"
-            data-bs-toggle="modal"
-            data-bs-target="#addExpenseModal"
-          >
-            Add Expense
-          </button>
         </div>
       </div>
 
@@ -707,6 +817,57 @@ useEffect(() => {
           </div>
         </div>
       </div>
+
+      {/* Category Modal */}
+      <div className="modal fade" id="addCategoryModal" tabIndex="-1" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+
+            {/* Header */}
+            <div className="modal-header">
+              <h5 className="modal-title">Add Category</h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            {/* Body */}
+            <div className="modal-body">
+              <div className="mb-3">
+                <label className="form-label">Category Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="categoryName"
+                  value={categoryForm.name}
+                  onChange={handleCategoryChange}
+                  placeholder="e.g. Food, Travel"
+                />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="modal-footer">
+              <button
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleCategorySubmit}
+              >
+                Save Category
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
     </>
   );
 }
