@@ -5,9 +5,7 @@ import "./Report.css";
 import Chart from "react-apexcharts";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import styled from "@emotion/styled";
-import { color } from "chart.js/helpers";
-import { colors } from "@mui/material";
+
 
 export default function Reports() {
   const [filter, setFilter] = useState("month");
@@ -24,9 +22,10 @@ export default function Reports() {
   const [overallTotal,setOverAllTotal] = useState(0);
   const token = localStorage.getItem("token");
 
-  const [lineChartYear,setLineChartYear] = useState(today);
+  const [lineChartYear, setLineChartYear] = useState(new Date()); // year selection
   const [lineChartData, setLineChartData] = useState([]);
   const [lineChartSeries, setLineChartSeries] = useState([]);
+  const [lineChartOptions, setLineChartOptions] = useState({});
 
   const navigate = useNavigate();
 
@@ -336,84 +335,83 @@ export default function Reports() {
 
     // --------------------------- Line Chart -----------------------------
 
-    const getDataforLineChart = () => {
-      axios.post("http://127.0.0.1:3000/api/expenses/monthly",
-        {
-          "year" : lineChartYear.getFullYear()
-        },
-        {
-          headers : {
-            Authorization : `Bearer ${token}`
-          }
-        }
-      ).then((res)=>{
-        setLineChartData(res.data.monthlyExpenses || []);
-      }).catch((err)=>{
-        console.log(err);
-      })
+      const monthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  // Fetch data from API
+  const getDataforLineChart = async () => {
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:3000/api/expenses/monthly",
+        { year: lineChartYear.getFullYear() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setLineChartData(res.data.monthlyExpenses || []);
+    } catch (err) {
+      console.log(err);
+      setLineChartData([]); // fallback empty
     }
+  };
 
-    useEffect(() => {
-      getDataforLineChart();
-    }, [lineChartYear]);
+  // Fetch data when year changes
+  useEffect(() => {
+    getDataforLineChart();
+  }, [lineChartYear]);
 
-    useEffect(() => {
-      if (lineChartData.length === 0) {
-        setLineChartSeries([
-          {
-            name: "Monthly Expense",
-            data: Array(12).fill(0),
-          },
-        ]);
-        return;
-      }
+  // Build chart series and options dynamically whenever data changes
+  useEffect(() => {
+    // Prepare monthly totals
+    const monthlyTotals = Array(12).fill(0);
+    lineChartData.forEach((item) => {
+      monthlyTotals[item.month - 1] = Number(item.total);
+    });
 
-      const monthlyTotals = Array(12).fill(0);
+    // Set series
+    setLineChartSeries([
+      {
+        name: "Monthly Expense",
+        data: monthlyTotals,
+      },
+    ]);
 
-      lineChartData.forEach((item) => {
-        monthlyTotals[item.month - 1] = Number(item.total);
-      });
-
-      setLineChartSeries([
-        {
-          name: "Expense",
-          data: monthlyTotals,
-        },
-      ]);
-    }, [lineChartData]);
-
-    // --- Line Chart Data ----
-
-    const monthNames = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    ];
-
-   const lineChartOptions = {
+    // Set options dynamically
+    setLineChartOptions({
       chart: {
         type: "line",
         toolbar: { show: false },
-         foreColor: "#ffffff", 
+        foreColor: "#ffffff",
       },
       stroke: {
         curve: "smooth",
         width: 2,
       },
       markers: {
-        size: 2,
+        size: 4,
       },
       xaxis: {
         categories: monthNames,
+        labels: {
+          style: { colors: "#ffffff" },
+        },
+      },
+      yaxis: {
+        labels: {
+          formatter: (val) => `₹ ${val}`,
+          style: { colors: "#ffffff" },
+        },
       },
       tooltip: {
         theme: "light",
         y: {
           formatter: (val) => `₹ ${val}`,
-          
         },
       },
       colors: ["#FF6702"],
-    };
+    });
+  }, [lineChartData]); // runs whenever data changes
+
 
   return (
     <>

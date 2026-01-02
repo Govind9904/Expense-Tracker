@@ -426,7 +426,7 @@ exports.getSelectedDateDateforChart = async (req,res) =>{
 exports.getMonthlyDataforYear = async (req,res) => {
   try{
   const userId = req.user.id;
-    const { year }  = req.body;
+  const { year }  = req.body;
 
     const monthlyExpenses = await Expense.findAll({
       attributes : [
