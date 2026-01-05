@@ -384,7 +384,7 @@ export default function Reports() {
         foreColor: "#ffffff",
       },
       stroke: {
-        curve: "smooth",
+        curve: "straight",
         width: 2,
       },
       markers: {
@@ -411,7 +411,6 @@ export default function Reports() {
       colors: ["#FF6702"],
     });
   }, [lineChartData]); // runs whenever data changes
-
 
   return (
     <>
