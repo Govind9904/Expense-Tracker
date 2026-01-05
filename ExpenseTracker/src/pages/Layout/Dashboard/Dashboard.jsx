@@ -80,7 +80,7 @@ export default function Dashboard() {
   endDate.setHours(23, 59, 59, 999);
 
   useEffect(() => {
-    if (showMsg) {
+    if (showMsg) {  
       const timer = setTimeout(() => {
         setHide(true);
         setTimeout(() => setShowMsg(false), 500);
@@ -483,28 +483,6 @@ export default function Dashboard() {
     });
 };
 
-
-
-  const handleList = (Page) => {
-  if (Page === "Next") {
-    setListPage(prev => {
-      const nextPage = prev + 1;
-      setListPage(nextPage);
-      getExpenseList();
-    });
-  } 
-  else if (Page === "Back") {
-    setListPage(prev => {
-      if (prev === 1) return prev;
-      const prevPage = prev - 1;
-      setListPage(prevPage);
-      getExpenseList();
-    });
-  } 
-  else {
-    // console.log(Page);
-  }
-};
 
 useEffect(() => {
   if (startDate && endDate) {

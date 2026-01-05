@@ -2,7 +2,9 @@ const { User, Category } = require("../Models");
 const { Op, fn, col } = require("sequelize");
 const Expense = require("../Models/Expense");
 const sequelize = require("../Database/db");
+const PDFDocument = require("pdfkit");
 // const { parse } = require("dotenv");
+
 
 exports.createExpense = async (req, res) => {
   try {
@@ -450,3 +452,53 @@ exports.getMonthlyDataforYear = async (req,res) => {
     res.status(500).json({ error: err.message });
   }
 } 
+
+
+// --------------------- Bill Generation ----------------
+
+exports.getEntriesforBill = async (req,res) => {
+  const userId = req.user.id;
+  const { startDate , endDate } = req.body;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "startDate and endDate are required"
+      });
+    }
+
+    const entries =await Expense.findAll({
+    where : {
+      userId,
+      date : {
+        [Op.between] : [
+          startDate,endDate
+        ]
+      }
+    },
+    include : [
+      {
+        model :User,
+        as : "user",
+        attributes: ["id", "first_name", "last_name"],
+      },
+      {
+        model : Category,
+        as : "category",
+        attributes : ["id","name"]
+      }
+    ]
+  });
+
+  res.status(200).json({
+    data : entries,
+    success : true
+  })
+}
+
+
+// --------------- Download PDF ---------------
+
+exports.downloadPdf = async (req, res) => {
+};
+

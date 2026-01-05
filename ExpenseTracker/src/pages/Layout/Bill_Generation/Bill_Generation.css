@@ -1,0 +1,255 @@
+/* Bill Generation - Modern Glassy UI */
+.billgen-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+.billgen-card {
+  background: rgba(36, 38, 58, 0.92);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(31,162,255,0.10);
+  padding: 36px 32px;
+  min-width: 320px;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.06);
+}
+.billgen-title {
+  font-size: 1.4rem;
+  color: #1fa2ff;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.billgen-phase-select {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.billgen-label {
+  font-size: 1rem;
+  color: #b6c2e2;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.billgen-select {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ee;
+  font-size: 1rem;
+  background: #23243a;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(18,216,250,0.08);
+  outline: none;
+  min-width: 120px;
+}
+.billgen-select:focus {
+  border-color: #1fa2ff;
+}
+.billgen-custom-range {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.billgen-datepicker {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ee;
+  font-size: 1rem;
+  background: #23243a;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(18,216,250,0.08);
+  outline: none;
+  min-width: 120px;
+}
+.billgen-actions {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  margin-top: 18px;
+}
+.billgen-btn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(18,216,250,0.12);
+  transition: background 0.15s;
+}
+.billgen-pdf {
+  background: linear-gradient(90deg,#1fa2ff,#12d8fa);
+  color: #fff;
+}
+.billgen-excel {
+  background: linear-gradient(90deg,#FF6702,#FFCE56);
+  color: #fff;
+}
+.billgen-btn:hover {
+  opacity: 0.92;
+}
+/* Bill Generation - Full Page Modern UI */
+.billgen-fullpage {
+  min-height: 100vh;
+  width: 100vw;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  padding: 0;
+}
+.billgen-topbar {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 36px 0 18px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.billgen-period-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  background: rgba(36, 38, 58, 0.92);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(31,162,255,0.10);
+  padding: 18px 24px;
+  margin-bottom: 0;
+}
+.billgen-select, .billgen-datepicker {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ee;
+  font-size: 1rem;
+  background: #23243a;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(18,216,250,0.08);
+  outline: none;
+  min-width: 120px;
+}
+.billgen-select:focus, .billgen-datepicker:focus {
+  border-color: #1fa2ff;
+}
+.billgen-generate-btn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(90deg,#1fa2ff,#12d8fa);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(18,216,250,0.12);
+  transition: background 0.15s;
+}
+.billgen-generate-btn:hover {
+  opacity: 0.92;
+}
+.billgen-entries {
+  width: 100%;
+  max-width: 900px;
+  margin: 32px auto 0 auto;
+  background: rgba(36, 38, 58, 0.92);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(31,162,255,0.10);
+  padding: 32px 24px 24px 24px;
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.billgen-entries-title {
+  font-size: 1.18rem;
+  color: #1fa2ff;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+.billgen-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 18px;
+  background: transparent;
+  color: #f3f6fa;
+}
+.billgen-table th, .billgen-table td {
+  padding: 12px 8px;
+  text-align: left;
+  font-size: 1rem;
+  color: #f3f6fa;
+  background: rgba(36, 38, 58, 0.92);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.billgen-table th {
+  background: rgba(31,162,255,0.10);
+  font-weight: 600;
+  color: #1fa2ff;
+}
+.billgen-download-row {
+  display: flex;
+  gap: 18px;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+.billgen-btn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(18,216,250,0.12);
+  transition: background 0.15s;
+}
+.billgen-pdf {
+  background: linear-gradient(90deg,#1fa2ff,#12d8fa);
+  color: #fff;
+}
+.billgen-excel {
+  background: linear-gradient(90deg,#FF6702,#FFCE56);
+  color: #fff;
+}
+.billgen-btn:hover {
+  opacity: 0.92;
+}
+@media (max-width: 900px) {
+  .billgen-topbar, .billgen-entries {
+    max-width: 98vw;
+    padding: 12px 2px;
+  }
+  .billgen-period-row {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 8px;
+  }
+}
+@media (max-width: 600px) {
+  .billgen-fullpage {
+    padding: 0;
+  }
+  .billgen-topbar, .billgen-entries {
+    padding: 4px 0;
+  }
+  .billgen-period-row {
+    padding: 6px 2px;
+  }
+  .billgen-table th, .billgen-table td {
+    padding: 6px 2px;
+    font-size: 0.92rem;
+  }
+  .billgen-download-row {
+    gap: 8px;
+  }
+}

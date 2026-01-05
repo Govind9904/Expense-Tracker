@@ -27,6 +27,10 @@ export default function Reports() {
   const [lineChartSeries, setLineChartSeries] = useState([]);
   const [lineChartOptions, setLineChartOptions] = useState({});
 
+  const [userExpense, setUserExpense] = useState([]);
+  const [listPage, setListPage] = useState(1);
+  const [totalPages , setTotalPages] = useState(0);
+
   const navigate = useNavigate();
 
   
@@ -50,6 +54,47 @@ export default function Reports() {
     });
   }
   
+  const listStartDate = new Date(startDate.getFullYear(),startDate.getMonth(),1);
+  listStartDate.setHours(0, 0, 0, 0);
+
+  // End of current month
+  const listEndDate = new Date(endDate.getFullYear(),endDate.getMonth() + 1,0);
+  listEndDate.setHours(23, 59, 59, 999);
+
+  const getExpenseList = () => {
+    axios
+      .post("http://127.0.0.1:3000/api/expenses",
+        {
+          listPage,
+          startDate : listStartDate ,
+          endDate : listEndDate 
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        setTotalPages(res.data.totalPages);
+        setUserExpense(res.data.expenses);
+      })
+      .catch((err) => {
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          setHide(false);
+          setError(err.message);
+          setShowMsg(true);
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
+      });
+  };
+  
   useEffect(()=>{
     if (!token) {
       navigate("/");
@@ -57,6 +102,7 @@ export default function Reports() {
 
     getCategories();
     getDataforLineChart();
+    getExpenseList();
   },[]);
 
   const getPieChartDataforYear = () =>{
@@ -412,106 +458,195 @@ export default function Reports() {
     });
   }, [lineChartData]); // runs whenever data changes
 
+  // Expense List 
+   const handleList = (Page) => {
+    if (Page === "Next") {
+      setListPage(prev => {
+        const nextPage = prev + 1;
+        setListPage(nextPage);
+        getExpenseList();
+      });
+    } 
+    else if (Page === "Back") {
+      setListPage(prev => {
+        if (prev === 1) return prev;
+        const prevPage = prev - 1;
+        setListPage(prevPage);
+        getExpenseList();
+      });
+    } 
+    else {
+      console.log(Page);
+    }
+  };
+
+  useEffect(() => {
+      getExpenseList();
+  }, [listPage]);
+
   return (
     <>
-    <div className="report-header">
-      <div>
-        <h3>Filter by</h3>
-      </div>
-      <div>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        >
-          <option value="year">Year</option>
-          <option value="month">Month</option>
-          <option value="date">Date</option>
-          <option value="previousMonth">Previous Month</option>
-          <option value="sixMonth">Last 6 Months</option>
-          <option value="lastYear">Last Year</option>
-        </select>
+    <div className="report-page">
 
-        <div className="filter-inputs">
-
-          {filter === "year" && (
-            <DatePicker
-              selected={year}
-              onChange={(date) => setYear(date)}
-              showYearPicker
-              dateFormat="yyyy"
-              className="custom-input"
-            />
-          )}
-
-          {filter === "month" && (
-            <DatePicker
-              selected={month}
-              onChange={(date) => setMonth(date)}
-              showMonthYearPicker
-              dateFormat="MMM     yyyy" 
-              className="custom-input"
-            />
-          )}
-
-          {filter === "date" && (
-            <div className="date-range">
-            <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date)}
-              selectsStart
-              startDate={startDate}
-              dateFormat="yyyy-MM-dd"
-              placeholderText="Start Date"
-              className="custom-input"
-            />
-             <span>to</span>
-
-            <DatePicker
-              selected={endDate}
-              onChange={(date) => setEndDate(date)}
-              selectsEnd
-              endDate={endDate}
-              dateFormat="yyyy-MM-dd"
-              placeholderText="End Date"
-              className="custom-input"
-            />
+      <div className="repor-tpage-graphs">
+        <div className="report-header">
+          <div className="select-header">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            >
+              <option value="year">Year</option>
+              <option value="month">Month</option>
+              <option value="date">Date</option>
+              <option value="previousMonth">Previous Month</option>
+              <option value="sixMonth">Last 6 Months</option>
+              <option value="lastYear">Last Year</option>
+            </select>
           </div>
-          )}
+            <div className="filter-inputs">
 
+              {filter === "year" && (
+                <DatePicker
+                  selected={year}
+                  onChange={(date) => setYear(date)}
+                  showYearPicker
+                  dateFormat="yyyy"
+                  className="custom-input"
+                />
+              )}
+
+              {filter === "month" && (
+                <DatePicker
+                  selected={month}
+                  onChange={(date) => setMonth(date)}
+                  showMonthYearPicker
+                  dateFormat="MMM     yyyy" 
+                  className="custom-input"
+                />
+              )}
+
+              {filter === "date" && (
+                <div className="date-range">
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  selectsStart
+                  startDate={startDate}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Start Date"
+                  className="custom-input"
+                />
+                <span>to</span>
+
+                <DatePicker
+                  selected={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  selectsEnd
+                  endDate={endDate}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="End Date"
+                  className="custom-input"
+                />
+              </div>
+              )}
+          </div>
         </div>
-      </div>
-    </div>
+            
+        <div className="charts">
+          <div className="select-category">
+            <label htmlFor="">Category : </label>
+            <select className="categorySelector" onChange={(e)=>setFilterCategory(e.target.value)}>
+              <option value="All">All Category</option>
+              {category.map((item) => (
+                <option key={item.id} value={item.name}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </div>
           
-    <div className="charts">
-      <div>
-        <label htmlFor="">Category : </label>
-        <select className="categorySelector" onChange={(e)=>setFilterCategory(e.target.value)}>
-          <option value="All">All Category</option>
-          {category.map((item) => (
-            <option key={item.id} value={item.name}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-      </div>
-      
-      <div className="pieChart">
-        <div style={{ width: "300px" , alignItems : "start", height : "300px", maxWidth : "500px" , maxHeight : "500px" }}>
-          {chartSeries.length > 0 && (
-            <Chart
-              type="pie"
-              series={chartSeries}
-              options={chartOptions}
-              height="100%"
-            />
-          )}
+          <div className="pieChart">
+            <div style={{ width: "350px" , alignItems : "start", height : "350px", maxWidth : "500px" , maxHeight : "500px" }}>
+              {chartSeries.length > 0 && (
+                <Chart
+                  type="pie"
+                  series={chartSeries}
+                  options={chartOptions}
+                  height="100%"
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
+        
+      {/* Expense List */}
+        <div className="expense-list">
+          <div className="expense-list-header">
+            <div className="expense-list-title">Latest Expense of This Month</div>
+            <div className="list-icon">
+              <button onClick={() => handleList("Back")} disabled={listPage === 1}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#1fa2ff"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-left-icon lucide-arrow-left"
+                >
+                  <path d="m12 19-7-7 7-7" />
+                  <path d="M19 12H5" />
+                </svg>
+              </button>
+              <button onClick={() => handleList("Next")} disabled={listPage === totalPages}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#1fa2ff"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-arrow-right-icon lucide-arrow-right"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <table className="expense-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Payment</th>
+                <th>Payment Mode</th>
+              </tr>
+            </thead>
+            <tbody>
+              {userExpense.map((expense) => (
+                <tr key={expense.id}>
+                  <td>{new Date(expense.date).toLocaleDateString()}</td>
+                  <td>{expense.description}</td>
+                  <td>{expense?.category?.name}</td>
+                  <td>₹{expense.amount}</td>
+                  <td>{expense.payment_mode}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
     </div>
-      {/* Line Chart  */}
-      
-      <div>
-        <Chart
+    <div className="line-chart">
+      <Chart
           options={lineChartOptions}
           series={lineChartSeries}
           type="line"

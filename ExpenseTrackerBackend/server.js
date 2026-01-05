@@ -6,6 +6,7 @@ const sequelize = require("./Database/db");
 
 const { User, Category, Expense } = require("./Models/index");
 
+app.use(express.json({ limit: "10mb" }));
 app.use(cors());
 app.use(express.json());
 

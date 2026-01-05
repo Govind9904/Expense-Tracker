@@ -151,29 +151,7 @@ body,
   color: #fff;
 }
 
-.expense-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 18px;
-  background: transparent;
-  color: #f3f6fa;
-}
 
-.expense-table th,
-.expense-table td {
-  padding: 16px 8px;
-  text-align: left;
-  font-size: 1rem;
-  color: #f3f6fa;
-  background: rgba(36, 38, 58, 0.92);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.expense-table th {
-  background: rgba(31, 162, 255, 0.1);
-  font-weight: 600;
-  color: #1fa2ff;
-}
 
 .add-expense-btn {
   background: linear-gradient(90deg, #1fa2ff, #12d8fa);

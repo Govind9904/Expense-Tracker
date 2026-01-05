@@ -92,6 +92,15 @@ function Layout() {
             </NavLink>
 
             <NavLink
+              to="/bill/generation"
+              className={({ isActive }) =>
+                isActive ? "menu-item active" : "menu-item"
+              }
+            >
+              Expense Bill Generation
+            </NavLink>
+
+            <NavLink
               to="/profile"
               className={({ isActive }) =>
                 isActive ? "menu-item active" : "menu-item"

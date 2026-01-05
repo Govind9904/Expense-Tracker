@@ -36,11 +36,12 @@ router.post("/report/expense/year",authenticateToken,ExpenseController.getYearly
 router.post("/report/expense/month",authenticateToken,ExpenseController.getSelectedMonthDataforChart);
 router.post("/report/expense/date",authenticateToken,ExpenseController.getSelectedDateDateforChart);
 
+router.post("/bill/generate",authenticateToken , ExpenseController.getEntriesforBill);
+
 router.post("/register", userController.register);
 router.post("/login", userController.login);
 
-
-// -------------- Report Page Route -----------------
+router.post("/download/pdf",ExpenseController.downloadPdf);
 
 
 // Logout Route
