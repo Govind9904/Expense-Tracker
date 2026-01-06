@@ -1,0 +1,101 @@
+/* Beautiful Glassy Profile Page */
+.profile-root {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+.profile-card {
+  background: rgba(36, 38, 58, 0.92);
+  border-radius: 22px;
+  box-shadow: 0 4px 32px rgba(31,162,255,0.13);
+  padding: 44px 36px 32px 36px;
+  min-width: 320px;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.08);
+  position: relative;
+}
+.profile-avatar-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.profile-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #1fa2ff;
+  box-shadow: 0 2px 16px rgba(31,162,255,0.18);
+  background: #fff;
+}
+.profile-info {
+  width: 100%;
+  margin-bottom: 18px;
+}
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+.profile-field label {
+  font-size: 1rem;
+  color: #1fa2ff;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.profile-field span, .profile-field input {
+  font-size: 1.08rem;
+  color: #fff;
+  font-weight: 500;
+  background: none;
+  border: none;
+  outline: none;
+}
+.profile-field input {
+  background: #23243a;
+  border-radius: 8px;
+  border: 1px solid #e6e9ee;
+  padding: 8px 12px;
+  color: #fff;
+  margin-top: 2px;
+  font-size: 1.08rem;
+  transition: border 0.18s;
+}
+.profile-field input:focus {
+  border-color: #1fa2ff;
+}
+.profile-edit-btn {
+  margin-top: 10px;
+  padding: 12px 32px;
+  border-radius: 10px;
+  background: linear-gradient(90deg,#1fa2ff,#12d8fa);
+  color: #fff;
+  font-size: 1.08rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(18,216,250,0.12);
+  transition: background 0.15s, opacity 0.15s;
+}
+.profile-edit-btn:hover {
+  opacity: 0.92;
+}
+@media (max-width: 600px) {
+  .profile-card {
+    padding: 16px 4px 12px 4px;
+    min-width: unset;
+    max-width: 98vw;
+  }
+  .profile-avatar {
+    width: 70px;
+    height: 70px;
+  }
+}
