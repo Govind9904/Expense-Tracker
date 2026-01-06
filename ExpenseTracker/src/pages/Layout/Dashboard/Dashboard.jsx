@@ -228,7 +228,7 @@ export default function Dashboard() {
         }
       )
       .then((res) => {
-        // console.log("List",res);
+        console.log("List",res);
         setTotalPages(res.data.totalPages);
         setUserExpense(res.data.expenses);
       })
@@ -540,7 +540,7 @@ useEffect(() => {
         </div>
         {/* Expense Graph */}
         <div className="dashboard-graph">
-          {/* <div className="graph-back-next-btn">
+          <div className="graph-back-next-btn">
             <button
               className="graph-nav-btn"
               onClick={() => handleClickon("Back")}
@@ -580,7 +580,7 @@ useEffect(() => {
                 <path d="m9 18 6-6-6-6" />
               </svg>
             </button>
-          </div> */}
+          </div>
           <Chart
             type="bar"
             options={chartOptions}

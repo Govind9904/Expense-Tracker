@@ -70,6 +70,7 @@ export default function Login() {
         }, 10);
       }
     } catch (err) {
+      console.log(err)
       setHide(false);
       setShowMsg(false);
       setTimeout(() => {

@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function Bill_Generation() {
-  const [phase, setPhase] = useState('month');
+  const [phase, setPhase] = useState("month");
   const [customStart, setCustomStart] = useState(null);
   const [customEnd, setCustomEnd] = useState(null);
   const [showEntries, setShowEntries] = useState(false);
@@ -16,11 +16,131 @@ function Bill_Generation() {
 
   const navigate = useNavigate();
 
-  const getEntries = () => {
+  // Get Last Month
+
+  const getLastMonth = () => {
+  const today = new Date();
+
+  // First day of current month
+  const firstDayOfCurrentMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1,
+    0, 0, 0, 0
+  );
+
+  // Last day of previous month
+  const endDate = new Date(firstDayOfCurrentMonth);
+  endDate.setMilliseconds(-1); // goes to previous month's last millisecond
+
+  // First day of previous month
+  const startDate = new Date(
+    endDate.getFullYear(),
+    endDate.getMonth(),
+    1,
+    0, 0, 0, 0
+  );
+
+  console.log(startDate,endDate)
+
+  return { startDate, endDate };
+};
+
+
+  // ---- for Last Six Month ---- 
+  
+  const getLastThreeMonths = () => {
+  const today = new Date();
+
+  // First day of current month
+  const firstDayOfCurrentMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1,
+    0, 0, 0, 0
+  );
+
+  // End date = last day of previous month
+  const endDate = new Date(firstDayOfCurrentMonth);
+  endDate.setMilliseconds(-1);
+
+  // Start date = first day, 3 months before endDate month
+  const startDate = new Date(
+    endDate.getFullYear(),
+    endDate.getMonth() - 2,
+    1,
+    0, 0, 0, 0
+  );
+
+  return { startDate, endDate };
+};
+
+  // ---- for Last Six Month ---- 
+  
+const getLastSixMonth = () => {
+  const today = new Date();
+
+  // 1️⃣ First day of current month
+  const firstDayOfCurrentMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1,
+    0, 0, 0, 0
+  );
+
+  // 2️⃣ End date = last millisecond of previous month
+  const endDate = new Date(firstDayOfCurrentMonth);
+  endDate.setMilliseconds(-1);
+
+  // 3️⃣ Start date = first day, 6 months before endDate month
+  const startDate = new Date(
+    endDate.getFullYear(),
+    endDate.getMonth() - 5,
+    1,
+    0, 0, 0, 0
+  );
+
+  console.log(startDate, endDate);
+  return { startDate, endDate };
+};
+
+
+  
+  // ----------- For Last Year ------------ 
+
+  const getLastYear = () => {
+  const today = new Date();
+  const lastYear = today.getFullYear() - 1;
+
+  // Start: Jan 1 of last year
+  const startDate = new Date(
+    lastYear,
+    0, // January
+    1,
+    0, 0, 0, 0
+  );
+
+  // End: Dec 31 of last year
+  const endDate = new Date(
+    lastYear,
+    11, // December
+    31,
+    23, 59, 59, 999
+  );
+
+  console.log(startDate,endDate)
+  return { startDate, endDate };
+};
+  
+  
+  // Get Last Month Entries 
+  const getLastMonthEntries = () => {
+    const { startDate , endDate } = getLastMonth();
+
     axios.post("http://127.0.0.1:3000/api/bill/generate",
      {
-        startDate : customStart,
-        endDate : customEnd
+        startDate,
+        endDate
      },
      {
       headers : {
@@ -32,23 +152,131 @@ function Bill_Generation() {
         setShowEntries(true)
      }).catch((err)=>{
       console.log(err);
+    })
+  }
+
+  // Get Entries for Last Three Months
+    const getLastThreeEntries = () => {
+      
+      const { startDate , endDate } = getLastThreeMonths();
+
+      console.log(startDate , endDate)
+ 
+    axios.post("http://127.0.0.1:3000/api/bill/generate",
+     {
+       startDate,
+       endDate
+     },
+     {
+      headers : {
+        Authorization : `Bearer ${token}`
+      }
+     }).then((res)=>{
+        setData(res.data.data);
+        console.log(res.data.data)
+        setShowEntries(true)
+      }).catch((err)=>{
+        console.log(err);
      })
   }
 
-  const handleDownloadPDF = () =>{
-    axios.post("http://127.0.0.1:3000/api/download/pdf",
-      {
-        data
-      },
-      {
-        responseType : "blob"
-      
-      }).then((res)=>{
-        console.log(res);
-      }).catch((err)=>{
-        console.log(err);
-      })
+  // Get Last Six Month Entries
+  const getLastSixEntries = () => {
+
+  const { startDate , endDate } = getLastSixMonth();
+  axios.post("http://127.0.0.1:3000/api/bill/generate",
+    {
+        startDate,
+        endDate
+    },
+    {
+    headers : {
+      Authorization : `Bearer ${token}`
+    }
+    }).then((res)=>{
+      setData(res.data.data);
+      console.log(res.data.data)
+      setShowEntries(true)
+    }).catch((err)=>{
+    console.log(err);
+    })
   }
+
+  const getLastYearEntries = () => {
+
+  const { startDate , endDate } = getLastYear();
+  axios.post("http://127.0.0.1:3000/api/bill/generate",
+    {
+        startDate,
+        endDate
+    },
+    {
+    headers : {
+      Authorization : `Bearer ${token}`
+    }
+    }).then((res)=>{
+      setData(res.data.data);
+      console.log(res.data.data)
+      setShowEntries(true)
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
+
+  const getEntries = () => {
+    if(phase === "month"){
+      getLastMonthEntries();
+    }
+    if(phase === "3month"){
+      getLastThreeEntries();
+    }
+    if(phase === "6month"){
+      getLastSixEntries();
+    }
+    if(phase === "year"){
+      getLastYearEntries();
+    }
+  }
+
+  const handleDownloadPDF = async () => {
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/download/pdf",
+      { 
+        data: data,
+        startDate : customStart,
+        endDate : customEnd
+       }, // your array
+      {
+        responseType: "blob", // VERY IMPORTANT
+        headers: {
+          Accept: "application/pdf",
+        },
+      }
+    );
+
+    // 👇 Create PDF file from blob
+    const file = new Blob([response.data], {
+      type: "text/html",
+    });
+
+    // 👇 Create downloadable link
+    const fileURL = window.URL.createObjectURL(file);
+    const link = document.createElement("a");
+
+    link.href = fileURL;
+    link.download = "report.pdf";
+    document.body.appendChild(link);
+    link.click();
+
+    // 👇 Cleanup
+    link.remove();
+    window.URL.revokeObjectURL(fileURL);
+
+  } catch (error) {
+    console.error("PDF download error:", error);
+  }
+};
 
   useEffect(()=>{
       if(!token){
@@ -77,20 +305,20 @@ function Bill_Generation() {
               <DatePicker
                 selected={customStart}
                 onChange={date => setCustomStart(date)}
-                dateFormat="yyyy-MM-dd"
+                dateFormat="dd/MM/yyyy"
                 className="billgen-datepicker"
                 placeholderText="Start date"
               />
               <DatePicker
                 selected={customEnd}
                 onChange={date => setCustomEnd(date)}
-                dateFormat="yyyy-MM-dd"
+                dateFormat="dd/MM/yyyy"
                 className="billgen-datepicker"
                 placeholderText="End date"
               />
             </>
           )}
-          <button className="billgen-generate-btn" onClick={() => getEntries()}>
+          <button className="billgen-generate-btn" onClick={getEntries}>
             Generate
           </button>
         </div>
@@ -111,7 +339,7 @@ function Bill_Generation() {
             <tbody>
               {data.map((entry, idx) => (
                 <tr key={idx}>
-                  <td>{entry.date}</td>
+                  <td>{new Date(entry.date).toLocaleDateString()}</td>
                   <td>{entry.category?.name}</td>
                   <td>{entry.description}</td>
                   <td>{entry.payment_mode}</td>

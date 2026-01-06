@@ -3,7 +3,7 @@ const { Op, fn, col } = require("sequelize");
 const Expense = require("../Models/Expense");
 const sequelize = require("../Database/db");
 const PDFDocument = require("pdfkit");
-// const { parse } = require("dotenv");
+const puppeteer = require("puppeteer");
 
 
 exports.createExpense = async (req, res) => {
@@ -468,26 +468,27 @@ exports.getEntriesforBill = async (req,res) => {
     }
 
     const entries =await Expense.findAll({
-    where : {
-      userId,
-      date : {
-        [Op.between] : [
-          startDate,endDate
-        ]
-      }
-    },
-    include : [
-      {
-        model :User,
-        as : "user",
-        attributes: ["id", "first_name", "last_name"],
+      where : {
+        userId,
+        date : {
+          [Op.between] : [
+            startDate,endDate
+          ]
+        }
       },
-      {
-        model : Category,
-        as : "category",
-        attributes : ["id","name"]
-      }
-    ]
+      include : [
+        {
+          model :User,
+          as : "user",
+          attributes: ["id", "first_name", "last_name"],
+        },
+        {
+          model : Category,
+          as : "category",
+          attributes : ["id","name"]
+        }
+      ],
+      order :[[sequelize.literal("date"),"ASC"]],
   });
 
   res.status(200).json({
@@ -500,5 +501,118 @@ exports.getEntriesforBill = async (req,res) => {
 // --------------- Download PDF ---------------
 
 exports.downloadPdf = async (req, res) => {
+  try {
+    const { reportInfo = {}, submittedBy = {}, submittedTo = {}, data , startDate , endDate  } = req.body;
+
+    // Safety defaults
+    const submittedByName = submittedBy.name || "-";
+    const submittedByDept = submittedBy.department || "-";
+    const submittedById = submittedBy.employeeId || "-";
+
+    // Calculate total safely
+    const totalAmount = Array.isArray(data)
+      ? data.reduce((sum, e) => sum + Number(e.amount || 0), 0)
+      : 0;
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+
+    // Build HTML dynamically
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial; font-size: 12px; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #333; padding: 6px; text-align: left; }
+        th { background: #1f4e79; color: white; }
+        .section-title { margin-top: 20px; font-weight: bold; }
+      </style>
+    </head>
+    <body>
+
+    <h1>Expense Report</h1>
+
+    <div class="section-title">Reporting Period</div>
+    <table>
+    <tr>
+      <td>Start Date</td><td>${new Date(startDate).toLocaleDateString()}</td>
+      <td>End Date</td><td>${new Date(endDate).toLocaleDateString()}</td>
+    </tr>
+    </table>
+
+    <div class="section-title">Submitted By</div>
+    <table>
+    <tr>
+      <td>${data[0].user?.first_name} ${data[0].user?.last_name}</td>
+    </tr>
+    </table>
+
+    <div class="section-title">Expense Details</div>
+    <table>
+    <thead>
+    <tr>
+      <th>Date</th>
+      <th>Description</th>
+      <th>Category</th>
+      <th>Amount</th>
+    </tr>
+    </thead>
+    <tbody>
+    ${
+      Array.isArray(data) && data.length > 0
+        ? data
+            .map(
+              (e) => `
+    <tr>
+      <td>${new Date(e.date).toLocaleDateString() || "-"}</td>
+      <td>${e.description || "-"}</td>
+      <td>${e.category?.name || "-"}</td>
+      <td>₹${e.amount || 0}</td>
+    </tr>`
+            )
+            .join("")
+        : `<tr><td colspan="4" style="text-align:center;">No expenses found</td></tr>`
+    }
+    </tbody>
+    </table>
+
+    <h3 style="text-align:right">Total: ₹${totalAmount}</h3>
+
+    <p style="text-align:center;font-size:10px">
+      *DON'T FORGET TO ATTACH ALL RECEIPTS*
+    </p>
+
+    </body>
+    </html>
+    `;
+
+    await page.setContent(html, { waitUntil: "networkidle0" });
+
+    const pdf = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      margin: { top: "20px", bottom: "20px", left: "20px", right: "20px" },
+    });
+
+    await browser.close();
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": "attachment; filename=Expense_Report.pdf",
+    });
+
+    res.send(pdf);
+  } catch (err) {
+    console.error("PDF generation error:", err);
+    res.status(500).json({ error: "Failed to generate PDF", details: err.message });
+  }
 };
+
 
