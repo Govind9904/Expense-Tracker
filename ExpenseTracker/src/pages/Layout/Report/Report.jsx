@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./Report.css";
 import Chart from "react-apexcharts";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import spendingImg  from "../../../assets/spending.png"
+import categories from "../../../assets/categories.png"
+import report from "../../../assets/report.png"
 
 
 export default function Reports() {
@@ -32,6 +36,104 @@ export default function Reports() {
   const [totalPages , setTotalPages] = useState(0);
 
   const navigate = useNavigate();
+
+  // Expense form state
+    const [expenseFormData, setExpenseFormData] = useState({
+      date: "",
+      description: "",
+      amount: "",
+      categoryId: "",
+      payment_mode: "",
+    });
+
+   // Expense form change handler
+  const handleChnageExpense = (e) => {
+    const { name, value } = e.target;
+    setExpenseFormData((prevData) => {
+      return {
+        ...prevData,
+        [name]: value,
+      };
+    });
+  };
+
+   // Expense form submit handler
+  const handleExoenseFormSubmit = () => {
+
+    axios
+      .post("http://127.0.0.1:3000/api/add/expense", expenseFormData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        // Refresh expense list
+        setUserExpense((prevExpenses) => [res.data.expense, ...prevExpenses]);
+        getExpenseList();
+        getExpenseAndCategories();
+        getGraphData();
+        getTodayExpense();
+        // Auto close modal
+        closeModal();
+        // Reset form
+        setExpenseFormData({
+          date: "",
+          description: "",
+          amount: "",
+          categoryId: "",
+          payment_mode: "",
+        });
+      })
+      .catch((err) => {
+        console.error("Error adding expense:", err);
+      });
+  };
+
+  // Category Form State
+  const [categoryForm, setCategoryForm] = useState({
+    categoryName: "",
+  });
+
+    // Category form Change Handler
+    const handleCategoryChange = (e) =>{
+       const { name , value } = e.target;
+       setCategoryForm((prev)=>({
+        ...prev,
+        [name] : value
+       }))
+    }
+  
+    // Add Categort API
+    const handleCategorySubmit = () => {
+    axios
+      .post(
+        "http://127.0.0.1:3000/api/add/category",
+        categoryForm,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        // Refresh category list
+        setCategory((prev) => [...prev, res.data.category]);
+  
+        // Reset form
+        setCategoryForm({ name: "" });
+  
+        // Close modal
+        const modalEl = document.getElementById("addCategoryModal");
+        const modal = window.bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+      })
+      .catch((err) => {
+        setError(err.message || "Failed to add category");
+        setShowMsg(true);
+        console.log(err);
+      });
+  };
+
 
   
   
@@ -653,6 +755,198 @@ export default function Reports() {
           height={320}
           width={800}
         />
+      </div>
+
+       {/* Add Buttons for Expense */}
+        <div className="dashboard-card-expense">
+          <div className="dashboard-card-label">Quick Access</div>
+
+          <div className="dashboard-card-all">
+            <div className="">
+             <button className="add-expense-btn" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+               <img className="quick-access" src={spendingImg} alt="" /> New Expense
+              </button>
+            </div>
+            <div>
+             <button className="add-expense-btn" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+              <img className="quick-access" src={categories} alt="" />  Category
+              </button>
+            </div>
+            <div>
+              <Link to="/report">
+                <button className="add-expense-btn">
+                  <img className="quick-access" src={report} alt="" />  Report
+                </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+
+      {/* Expense Modal */}
+      {/* Add Expense Bootstrap Modal */}
+      <div
+        className="modal fade"
+        id="addExpenseModal"
+        tabIndex="-1"
+        aria-labelledby="addExpenseModalLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            {/* Header */}
+            <div className="modal-header">
+              <h5 className="modal-title" id="addExpenseModalLabel">
+                Add New Expense
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+
+            {/* Body */}
+            <div className="modal-body">
+              <form id="expenseForm">
+                <div className="mb-3">
+                  <label className="form-label">Date</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="date"
+                    value={expenseFormData.date}
+                    onChange={handleChnageExpense}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Description</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="description"
+                    value={expenseFormData.description}
+                    onChange={handleChnageExpense}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Amount</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    name="amount"
+                    value={expenseFormData.amount}
+                    onChange={handleChnageExpense}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Category</label>
+                  <select
+                    className="form-select"
+                    name="categoryId"
+                    value={expenseFormData.categoryId}
+                    onChange={handleChnageExpense}
+                  >
+                    <option value="">Select Category</option>
+                    {category.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Payment Mode</label>
+                  <select
+                    className="form-select"
+                    name="payment_mode"
+                    value={expenseFormData.payment_mode}
+                    onChange={handleChnageExpense}
+                  >
+                    <option value="">Select Payment Mode</option>
+                    <option value="cash">Cash</option>
+                    <option value="credit_card">Credit Card</option>
+                    <option value="debit_card">Debit Card</option>
+                    <option value="online_payment">Online Payment</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+
+            {/* Footer */}
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleExoenseFormSubmit}
+              >
+                Save Expense
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Category Modal */}
+      <div className="modal fade" id="addCategoryModal" tabIndex="-1" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+
+            {/* Header */}
+            <div className="modal-header">
+              <h5 className="modal-title">Add Category</h5>
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+              ></button>
+            </div>
+
+            {/* Body */}
+            <div className="modal-body">
+              <div className="mb-3">
+                <label className="form-label">Category Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="categoryName"
+                  value={categoryForm.name}
+                  onChange={handleCategoryChange}
+                  placeholder="e.g. Food, Travel"
+                />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="modal-footer">
+              <button
+                className="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleCategorySubmit}
+              >
+                Save Category
+              </button>
+            </div>
+
+          </div>
+        </div>
       </div>
     </>
   );

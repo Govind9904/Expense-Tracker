@@ -91,16 +91,7 @@ body,
   box-shadow: 0 6px 28px rgba(255, 109, 0, 0.4);
 }
 
-/* Card Labels */
-.dashboard-card-label{
-  color: #FF6D00;
-  border-bottom: 1px solid #FF6D00;
-  border-radius: 3px;
-  padding: 10px 0 10px 10px;
-  min-width: 100%;
-  font-weight: 700;
-  animation: fadeIn 0.6s ease;
-}
+
 
 .dashboard-card-expense{
     background: #1E1E1E;
@@ -129,41 +120,9 @@ body,
   animation: fadeIn 0.6s ease 0.1s;
 }
 
-/* Quick Access Buttons */
-.dashboard-card-all {
-  width: 100%;
-  display: flex;
-  justify-content: space-evenly;
-  margin: 15px 0px;
-  flex-wrap: wrap;
-}
 
-.add-expense-btn {
-  background: #FF6D00;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 1.08rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 2px 12px rgba(255,109,0,0.25);
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
-.add-expense-btn:hover {
-  background: #FFA040;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(255,164,64,0.4);
-}
 
-.quick-access {
-  width: 20px;
-  height: 20px;
-}
 
 /* Graph Container */
 .dashboard-graph {
