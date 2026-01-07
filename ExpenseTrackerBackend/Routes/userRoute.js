@@ -43,6 +43,11 @@ router.post("/login", userController.login);
 
 router.post("/download/pdf",ExpenseController.downloadPdf);
 
+// Get User Profile
+router.post("/get/user/profile",authenticateToken,ExpenseController.getUserProfile);
+
+// Update User Profile 
+router.post("/update/user/profile",authenticateToken,ExpenseController.updateUserProfile);
 
 // Logout Route
 router.post("/logout", authenticateToken, userController.logut);

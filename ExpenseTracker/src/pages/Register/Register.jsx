@@ -8,6 +8,8 @@ export default function Register() {
     first_name: "",
     last_name: "",
     email: "",
+    phone:"",
+    address : "",
     password: "",
     confirm_password: "",
   });
@@ -180,6 +182,32 @@ export default function Register() {
                   onChange={handleChange}
                   required
                 />
+              </div>
+
+              <div className="name-row">
+                <div className="register-group">
+                  <label>Phone</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    placeholder="phone"
+                    value={data.phone}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="register-group">
+                  <label>Address</label>
+                  <input
+                    type="text"
+                    name="address"
+                    placeholder="address"
+                    value={data.address}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
 
               <div className="register-group password-group">

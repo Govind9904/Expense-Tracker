@@ -1,19 +1,27 @@
+/* Black + Orange Theme: Report Page */
+
 .report-header {
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.select-header{
+.select-header {
   width: 150px;
   max-width: 200px;
-  margin-right: 10px;
+  margin: 0 10px 10px 0;
   height: 100px;
-  margin: 0 10px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .filter-inputs {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .date-range {
@@ -23,83 +31,143 @@
 
 .report-header select,
 .filter-inputs input {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.pieChart {
-  display: flex;
-  justify-content:flex-start;
-  width: 50%;
-  height: 50%;
-  margin-right: auto;
-}
-
-.charts{
-  border: 1px solid black;
-  padding: 50px;
-  margin: 15px;
+  padding: 8px 12px;
   border-radius: 8px;
-  align-self: flex-start;
-  position: relative;
-}
-.categorySelector{
-  margin: 0 5px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #1E1E1E;
+  color: #E0E0E0;
+  transition: border 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 
-.select-category{
+.report-header select:focus,
+.filter-inputs input:focus {
+  border: 1px solid #FF6D00;
+  outline: none;
+  transform: scale(1.02);
+  box-shadow: 0 0 8px #FF6D00;
+}
+
+.report-page {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.charts {
+  background: #1E1E1E;
+  border-radius: 12px;
+  padding: 30px;
+  margin: 10px;
+  flex: 1;
+  min-width: 300px;
+  position: relative;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.charts:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(255, 109, 0, 0.4);
+}
+
+.select-category {
   position: absolute;
-  top: -18px;
-  left: 105px;
-  right: 120px;
-  background: #ccc;
-  width: 250px;
+  top: -20px;
+  left: 20px;
+  right: 20px;
+  background: #FF6D00;
+  color: #121212;
+  width: calc(100% - 40px);
   display: flex;
   gap: 10px;
-  padding: 5px;
-  border-radius:10px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-.report-page{
-  display: flex;
+.select-category:hover {
+  background: #FFA040;
 }
 
-.line-chart{
-  border: 1px solid black;
-  border-radius: 10px;
+.line-chart {
+  margin-top: 20px;
+  border-radius: 12px;
+  background: #1E1E1E;
+  padding: 30px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.expense-list{
-  border: 1px solid black;
+.line-chart:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(255, 109, 0, 0.4);
+}
+
+button {
   border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  margin: 10px 2px;
+}
+
+
+button:hover {
+  border: 1px solid #FF6D00 !important;
+}
+
+
+.expense-list {
+  border-radius: 12px;
   height: 450px;
-  padding: 10px;
+  padding: 15px;
   width: 700px;
   margin-top: 128px;
+  background: #1E1E1E;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.expense-list:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(255, 109, 0, 0.4);
 }
 
 .expense-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 18px;
+  margin-bottom: 5px;
   background: transparent;
-  color: #f3f6fa;
-  height: 85%;
+  color: #E0E0E0;
 }
 
 .expense-table th,
 .expense-table td {
-  padding: 16px 8px;
+  padding: 14px 10px;
   text-align: left;
-  font-size: 1rem;
-  color: #f3f6fa;
-  background: rgba(36, 38, 58, 0.92);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.95rem;
+  color: #E0E0E0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background 0.3s ease;
 }
 
 .expense-table th {
-  background: rgba(31, 162, 255, 0.1);
-  font-weight: 800;
-  color: #1fa2ff;
+  background: rgba(255, 109, 0, 0.1);
+  font-weight: 700;
+  color: #FF6D00;
+}
+
+.expense-table tr:hover td {
+  background: rgba(255, 109, 0, 0.08);
+}
+
+.categorySelector {
+  margin-right: 5px;
 }

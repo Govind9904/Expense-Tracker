@@ -299,18 +299,18 @@ export default function Dashboard() {
   const today = new Date();
 
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
     "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
   const currentMonth = currentDate.month;
   const currentYear = currentDate.year;
@@ -433,13 +433,6 @@ export default function Dashboard() {
       })
       .catch((err) => {
         console.error("Error adding expense:", err);
-        setHide(false);
-        setShowMsg(false);
-
-        setTimeout(() => {
-          setError(err.message || "Something went wrong while adding expense");
-          setShowMsg(true); // trigger animation again
-        }, 10);
       });
   };
 

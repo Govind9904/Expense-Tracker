@@ -1,9 +1,8 @@
-import React from "react";
-import { NavLink, Outlet } from "react-router-dom";
-import "./Layout.css"; // make sure extension is correct
+// Layout.jsx
+import React, { useState, useEffect } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { useState , useEffect} from "react";
+import "./Layout.css"; // Sidebar + Layout CSS
 
 function Layout() {
   const token = localStorage.getItem("token");
@@ -12,16 +11,13 @@ function Layout() {
   const [hide, setHide] = useState(false);
   const [error, setError] = useState("");
 
-
   const handleLogout = () => {
     axios
       .post(
         "http://127.0.0.1:3000/api/logout",
         {},
         {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
+          headers: { Authorization: token ? `Bearer ${token}` : "" },
         }
       )
       .then((res) => {
@@ -31,7 +27,6 @@ function Layout() {
           setError(res.data.msg);
           setShowMsg(true);
           setHide(false);
-          return;
         }
       })
       .catch((err) => {
@@ -53,75 +48,34 @@ function Layout() {
   }, [showMsg]);
 
   return (
-    <>
-      <div>
-        {error && (
-          <div
-            className={`notification ${showMsg ? "show" : ""} ${
-              hide ? "hide" : ""
-            }`}
-          >
-            <p>{error}</p>
-            <button className="close-btn" onClick={() => setShowMsg(false)}>
-              ×
-            </button>
-          </div>
-        )}
-      </div>
-      <div className="layout-container">
-        <aside className="sidebar">
-          <div className="sidebar-title">Expense Tracker</div>
+    <div className="layout-container">
+      {/* Notification */}
+      {error && (
+        <div className={`notification ${showMsg ? "show" : ""} ${hide ? "hide" : ""}`}>
+          <p>{error}</p>
+          <button className="close-btn" onClick={() => setShowMsg(false)}>×</button>
+        </div>
+      )}
 
-          <nav className="sidebar-nav">
-            <NavLink
-              to="/dashboard"
-              className={({ isActive }) =>
-                isActive ? "menu-item active" : "menu-item"
-              }
-            >
-              Dashboard
-            </NavLink>
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <div className="sidebar-title">Expense Tracker</div>
 
-            <NavLink
-              to="/report"
-              className={({ isActive }) =>
-                isActive ? "menu-item active" : "menu-item"
-              }
-            >
-              Reports
-            </NavLink>
+        <nav className="sidebar-nav">
+          <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>Dashboard</NavLink>
+          <NavLink to="/report" className={({ isActive }) => isActive ? "active" : ""}>Reports</NavLink>
+          <NavLink to="/bill/generation" className={({ isActive }) => isActive ? "active" : ""}>Expense Bill Generation</NavLink>
+          <NavLink to="/profile" className={({ isActive }) => isActive ? "active" : ""}>Profile</NavLink>
+        </nav>
 
-            <NavLink
-              to="/bill/generation"
-              className={({ isActive }) =>
-                isActive ? "menu-item active" : "menu-item"
-              }
-            >
-              Expense Bill Generation
-            </NavLink>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      </aside>
 
-            <NavLink
-              to="/profile"
-              className={({ isActive }) =>
-                isActive ? "menu-item active" : "menu-item"
-              }
-            >
-              Profile
-            </NavLink>
-          </nav>
-
-          <div className="sidebar-logout">
-            <button className="logout-btn" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        </aside>
-
-        <main className="dashboard-main">
-          <Outlet />
-        </main>
-      </div>
-    </>
+      {/* Main Content */}
+      <main className="dashboard-main">
+        <Outlet />
+      </main>
+    </div>
   );
 }
 

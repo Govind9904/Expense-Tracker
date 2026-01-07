@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
     try {
-        const { first_name, last_name, email, password , confirm_password } = req.body;
+        const { first_name, last_name, email, phone ,address ,password , confirm_password } = req.body;
 
         // Check password match
         if (password !== confirm_password) {
@@ -28,6 +28,8 @@ exports.register = async (req, res) => {
             first_name,
             last_name,
             email,
+            phone,
+            address,
             password: hashedPassword
         });
 

@@ -566,7 +566,7 @@ export default function Reports() {
           </div>
           
           <div className="pieChart">
-            <div style={{ width: "350px" , alignItems : "start", height : "350px", maxWidth : "500px" , maxHeight : "500px" }}>
+            <div style={{ width: "350px" , alignItems : "start", height : "390px", maxWidth : "500px" , maxHeight : "500px" }}>
               {chartSeries.length > 0 && (
                 <Chart
                   type="pie"
@@ -592,7 +592,7 @@ export default function Reports() {
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#1fa2ff"
+                  stroke="#FF6D00"
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -609,7 +609,7 @@ export default function Reports() {
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="#1fa2ff"
+                  stroke="#FF6D00"
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"

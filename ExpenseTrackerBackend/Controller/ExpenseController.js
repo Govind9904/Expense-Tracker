@@ -1,5 +1,5 @@
 const { User, Category } = require("../Models");
-const { Op, fn, col } = require("sequelize");
+const { Op, fn, col, where } = require("sequelize");
 const Expense = require("../Models/Expense");
 const sequelize = require("../Database/db");
 const PDFDocument = require("pdfkit");
@@ -614,5 +614,83 @@ exports.downloadPdf = async (req, res) => {
     res.status(500).json({ error: "Failed to generate PDF", details: err.message });
   }
 };
+
+
+exports.getUserProfile = async (req,res) => {
+  try{
+    const userId = req.user.id;
+
+    if(!userId){
+      res.status(400).json({
+        message : "userID is Required"
+      })
+    }
+  
+    const profileData =await User.findAll(
+      {
+        where : userId
+      }
+    )
+
+    res.status(200).json({
+      success : true,
+      data : profileData
+    })
+  }catch(err){
+    res.status(500).json({
+      error : err
+    })
+  }
+}
+
+exports.updateUserProfile = async (req,res) =>{
+  try {
+    const userId = req.user.id; // from JWT middleware
+
+    const {
+      first_name,last_name,email,phone,address} = req.body;
+
+    // 🔒 Validate input (basic)
+    if (!first_name || !last_name) {
+      return res.status(400).json({
+        success: false,
+        message: "First name and last name are required"
+      });
+    }
+
+    // 🔍 Find user
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // 📝 Update fields
+    await user.update({
+      first_name,
+      last_name,
+      email,
+      phone,
+      address
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: user
+    });
+
+  } catch (error) {
+    console.error("Update Profile Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+}
 
 
