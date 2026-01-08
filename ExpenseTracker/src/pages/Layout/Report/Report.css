@@ -154,8 +154,7 @@ button:hover {
 
 .expense-list {
   border-radius: 12px;
-  height: 295px;
-  max-height: 500px;
+  height: 500px;
   padding: 15px;
   width: 95%;
   margin : 30px;

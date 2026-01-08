@@ -110,9 +110,8 @@ export default function Reports() {
       })
       .then((res) => {
         // Refresh expense list
-        setUserExpense((prevExpenses) => [res.data.expense, ...prevExpenses]);
         getExpenseList();
-        // Auto close modal
+        getDataforLineChart();
         closeModal();
         // Reset form
         setExpenseFormData({
@@ -538,7 +537,7 @@ export default function Reports() {
     if (filter === "lastYear") {
       getPieChartDataforLastYear();
     }
-  }, [filter, year, month, startDate, endDate, filterCategory]);
+  }, [filter, year, month, startDate, endDate, filterCategory,userExpense]);
 
   // 1️⃣ normalize totals (API-safe)
   const overallTotalSafe = Number(overallTotal) || 0;
