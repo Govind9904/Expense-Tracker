@@ -9,7 +9,7 @@ body,
   min-height: 100vh;
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial;
-  color: #E0E0E0;
+  color: #e0e0e0;
   overflow-x: hidden;
   overflow-y: auto; /* allow scroll */
   scroll-behavior: smooth;
@@ -72,7 +72,7 @@ body,
 }
 
 .dashboard-card {
-  background: #1E1E1E;
+  background: #1e1e1e;
   border-radius: 18px;
   box-shadow: 0 4px 24px rgba(255, 109, 0, 0.2);
   padding: 32px 40px;
@@ -81,8 +81,8 @@ body,
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  color: #E0E0E0;
-  border: 1.5px solid rgba(255,255,255,0.12);
+  color: #e0e0e0;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -91,23 +91,21 @@ body,
   box-shadow: 0 6px 28px rgba(255, 109, 0, 0.4);
 }
 
-
-
-.dashboard-card-expense{
-    background: #1E1E1E;
-    border-radius: 18px;
-    box-shadow: 0 4px 24px rgba(255, 109, 0, 0.2);
-    /* padding: 24px; */
-    margin-bottom: 32px;
-    height: 150px;
-    width: 100%;
-    /* max-width: 1100px; */
-    border: 1.5px solid rgba(255, 255, 255, 0.12);
-    transition: all 0.3s ease;
-    animation: fadeInUp 0.5s ease 0.2s
+.dashboard-card-expense {
+  background: #1e1e1e;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(255, 109, 0, 0.2);
+  /* padding: 24px; */
+  margin-bottom: 32px;
+  height: 150px;
+  width: 100%;
+  /* max-width: 1100px; */
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease 0.2s;
 }
 
-.expense-list-header{
+.expense-list-header {
   margin: 0 0 15px 0;
   font-weight: 900;
 }
@@ -116,24 +114,20 @@ body,
 .card-value {
   font-size: 2.2rem;
   font-weight: 700;
-  color: #E0E0E0;
+  color: #e0e0e0;
   animation: fadeIn 0.6s ease 0.1s;
 }
 
-
-
-
-
 /* Graph Container */
 .dashboard-graph {
-  background: #1E1E1E;
+  background: #1e1e1e;
   border-radius: 18px;
   box-shadow: 0 4px 24px rgba(255, 109, 0, 0.2);
   padding: 24px;
   margin-bottom: 32px;
   min-height: 320px;
   width: 100%;
-  border: 1.5px solid rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   transition: all 0.3s ease;
   animation: fadeInUp 0.5s ease 0.2s;
 }
@@ -157,26 +151,26 @@ body,
 .graph-nav-btn {
   padding: 2px;
   border-radius: 6px;
-  background: #FF6D00;
+  background: #ff6d00;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .graph-nav-btn:hover {
-  background: #FFA040;
+  background: #ffa040;
   transform: scale(1.05);
 }
 
 /* Expense List */
 .dashboard-expense-list {
-  background: #1E1E1E;
+  background: #1e1e1e;
   border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(255,109,0,0.2);
+  box-shadow: 0 4px 24px rgba(255, 109, 0, 0.2);
   padding: 40px 24px;
   margin-top: 0;
   overflow-x: auto;
-  border: 1.5px solid rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   animation: fadeInUp 0.5s ease 0.4s;
 }
 
@@ -184,12 +178,12 @@ body,
 .expense-table td {
   padding: 12px 16px;
   text-align: left;
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   transition: background 0.3s ease;
 }
 
 .expense-table tr:hover {
-  background: rgba(255,109,0,0.1);
+  background: rgba(255, 109, 0, 0.1);
 }
 
 /* Notifications */
@@ -197,7 +191,7 @@ body,
   position: fixed;
   top: 20px;
   right: 20px;
-  background-color: #FF9800;
+  background-color: #ff9800;
   color: #121212;
   padding: 1rem 1.2rem;
   border-radius: 8px;
@@ -230,25 +224,25 @@ body,
 
 /* Modals */
 .modal-content {
-  background: #1E1E1E;
-  color: #E0E0E0;
+  background: #1e1e1e;
+  color: #e0e0e0;
   border-radius: 12px;
-  border: 1.5px solid rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .modal-content:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(255,109,0,0.25);
+  box-shadow: 0 8px 32px rgba(255, 109, 0, 0.25);
 }
 
 .modal-header,
 .modal-footer {
-  border-bottom: 1px solid rgba(255,255,255,0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .modal-footer button {
-  background: #FF6D00;
+  background: #ff6d00;
   border: none;
   color: #fff;
   border-radius: 8px;
@@ -259,7 +253,7 @@ body,
 }
 
 .modal-footer button:hover {
-  background: #FFA040;
+  background: #ffa040;
   transform: translateY(-2px);
 }
 
@@ -299,7 +293,7 @@ body,
     gap: 6px;
   }
   .dashboard-card {
-    padding:2px 10px;
+    padding: 2px 10px;
     font-size: 0.92rem;
   }
   .dashboard-graph {
@@ -329,10 +323,13 @@ body,
 }
 
 @keyframes fadeIn {
-  0% {opacity: 0;}
-  100% {opacity: 1;}
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
-
 
 /* Black + Orange Theme: Report Page */
 
@@ -370,17 +367,17 @@ body,
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: #1E1E1E;
-  color: #E0E0E0;
+  background: #1e1e1e;
+  color: #e0e0e0;
   transition: border 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 
 .report-header select:focus,
 .filter-inputs input:focus {
-  border: 1px solid #FF6D00;
+  border: 1px solid #ff6d00;
   outline: none;
   transform: scale(1.02);
-  box-shadow: 0 0 8px #FF6D00;
+  box-shadow: 0 0 8px #ff6d00;
 }
 
 .report-page {
@@ -390,7 +387,7 @@ body,
 }
 
 .charts {
-  background: #1E1E1E;
+  background: #1e1e1e;
   border-radius: 12px;
   padding: 30px;
   margin: 10px;
@@ -411,7 +408,7 @@ body,
   top: -20px;
   left: 20px;
   right: 20px;
-  background: #FF6D00;
+  background: #ff6d00;
   color: #121212;
   width: calc(100% - 40px);
   display: flex;
@@ -423,13 +420,13 @@ body,
 }
 
 .select-category:hover {
-  background: #FFA040;
+  background: #ffa040;
 }
 
 .line-chart {
   margin-top: 20px;
   border-radius: 12px;
-  background: #1E1E1E;
+  background: #1e1e1e;
   padding: 30px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -453,11 +450,9 @@ button {
   margin: 10px 2px;
 }
 
-
 button:hover {
-  border: 1px solid #FF6D00 !important;
+  border: 1px solid #ff6d00 !important;
 }
-
 
 .expense-list {
   border-radius: 12px;
@@ -465,7 +460,7 @@ button:hover {
   padding: 15px;
   width: 700px;
   margin-top: 128px;
-  background: #1E1E1E;
+  background: #1e1e1e;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -481,7 +476,7 @@ button:hover {
   border-collapse: collapse;
   margin-bottom: 5px;
   background: transparent;
-  color: #E0E0E0;
+  color: #e0e0e0;
 }
 
 .expense-table th,
@@ -489,7 +484,7 @@ button:hover {
   padding: 14px 10px;
   text-align: left;
   font-size: 0.95rem;
-  color: #E0E0E0;
+  color: #e0e0e0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   transition: background 0.3s ease;
 }
@@ -497,7 +492,7 @@ button:hover {
 .expense-table th {
   background: rgba(255, 109, 0, 0.1);
   font-weight: 700;
-  color: #FF6D00;
+  color: #ff6d00;
 }
 
 .expense-table tr:hover td {

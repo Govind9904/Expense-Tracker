@@ -8,7 +8,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import spendingImg from "../../../assets/spending.png";
 import categories from "../../../assets/categories.png";
-
+import Swal from "sweetalert2";
 
 export default function Reports() {
   const [filter, setFilter] = useState("month");
@@ -34,8 +34,10 @@ export default function Reports() {
   const [listPage, setListPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
 
-  const [isEdit,setIsEdit] = useState(false);
-  const [editExpenseId,setEditExpenseId] = useState(null);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editExpenseId, setEditExpenseId] = useState(null);
+
+  const [deletedId, setDeletedId] = useState(null);
 
   const [currentDate, setCurrentDate] = useState({
     month: new Date().getMonth(), // 0-11
@@ -123,6 +125,15 @@ export default function Reports() {
       })
       .catch((err) => {
         console.error("Error adding expense:", err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
       });
   };
 
@@ -164,6 +175,15 @@ export default function Reports() {
         setError(err.message || "Failed to add category");
         setShowMsg(true);
         console.log(err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
       });
   };
 
@@ -183,6 +203,15 @@ export default function Reports() {
       })
       .catch((err) => {
         console.error("Error fetching categories:", err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
       });
   };
 
@@ -262,6 +291,15 @@ export default function Reports() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
       });
   };
 
@@ -288,6 +326,15 @@ export default function Reports() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
       });
   };
 
@@ -311,6 +358,15 @@ export default function Reports() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
       });
   };
 
@@ -351,10 +407,14 @@ export default function Reports() {
         setOverAllTotal(res.data.overallTotal);
       })
       .catch((err) => {
-        if (err.status === 403) {
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
           navigate("/");
-        } else {
-          console.log(err);
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
         }
       });
   };
@@ -399,6 +459,15 @@ export default function Reports() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
       });
   };
 
@@ -433,6 +502,15 @@ export default function Reports() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
       });
   };
 
@@ -615,38 +693,38 @@ export default function Reports() {
         setListPage(prevPage);
         getExpenseList();
       });
-    } else {
-      console.log(Page);
-    }
+    } 
   };
 
   useEffect(() => {
     getExpenseList();
   }, [listPage]);
 
-
   const handleEdit = (expense) => {
     setIsEdit(true);
     setEditExpenseId(expense.id);
 
-    console.log(expense.category?.id);
     setExpenseFormData({
-      date:expense.date.split("T")[0],
-      description:expense.description,
-      amount:expense.amount,
-      categoryId:expense.category?.id,
-      payment_mode:expense.payment_mode,
+      date: expense.date.split("T")[0],
+      description: expense.description,
+      amount: expense.amount,
+      categoryId: expense.category?.id,
+      payment_mode: expense.payment_mode,
     });
-  }
+  };
 
   const handleUpdateExpense = () => {
-    axios.post(`http://127.0.0.1:3000/api/update/expense/${editExpenseId}`,expenseFormData,
-      {
-        headers : {
-          Authorization : `Bearer ${token}`
-        },
-      }).then((res)=>{
-        console.log(res)
+    axios
+      .post(
+        `http://127.0.0.1:3000/api/update/expense/${editExpenseId}`,
+        expenseFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
         getExpenseList();
         getPieChartDataforMonth();
         getDataforLineChart();
@@ -659,12 +737,94 @@ export default function Reports() {
           categoryId: "",
           payment_mode: "",
         });
-      }).catch((err)=>{
-        console.log(err);
       })
-    
-  }
+      .catch((err) => {
+        console.log(err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
+      });
+  };
 
+  // const handleDelete = (id) => {
+  //   setDeletedId(id);
+  //   const confirmDelete = window.confirm(
+  //     "Are you sure you want to delete this expense?"
+  //   );
+
+  //   if (!confirmDelete) return;
+
+  //   axios
+  //     .post(
+  //       `http://127.0.0.1:3000/api/delete/expense/${id}`,
+  //       {},
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     )
+  //     .then((res) => {
+  //       getExpenseList();
+  //       getPieChartDataforMonth();
+  //       getDataforLineChart();
+  //     })
+  //     .catch((err) => {
+  //       console.error("Delete Expense Error:", err);
+
+  //       if (err.response?.data?.msg === "Invalid token") {
+  //         localStorage.removeItem("token");
+  //         navigate("/");
+  //       }
+
+  //       if (err.response?.status === 401) {
+  //         localStorage.removeItem("token");
+  //         navigate("/");
+  //       }
+  //     });
+  // };
+
+  const handleDelete = (id) => {
+    setDeletedId(id);
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Call delete API
+        axios
+          .post(`http://127.0.0.1:3000/api/delete/expense/${id}`, {} ,{
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((res) => {
+            // console.log(res.data);
+            getExpenseList();
+            getPieChartDataforMonth();
+            getDataforLineChart();
+
+            Swal.fire("Deleted!", "Expense has been deleted.", "success");
+          })
+          .catch((err) => {
+            console.error(err);
+            Swal.fire("Error!", "Something went wrong.", "error");
+          });
+      }
+    });
+  };
+  
   return (
     <>
       <div className="report-page">
@@ -877,7 +1037,8 @@ export default function Reports() {
                 <td>{expense.payment_mode}</td>
                 <td className="table-edit-delete-svg">
                   {/* EDIT */}
-                  <svg onClick={()=>handleEdit(expense)}
+                  <svg
+                    onClick={() => handleEdit(expense)}
                     data-bs-toggle="modal"
                     data-bs-target="#addExpenseModal"
                     xmlns="http://www.w3.org/2000/svg"
@@ -897,6 +1058,7 @@ export default function Reports() {
 
                   {/* DELETE */}
                   <svg
+                    onClick={() => handleDelete(expense.id)}
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
                     height="18"
@@ -1068,9 +1230,9 @@ export default function Reports() {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={ isEdit ? handleUpdateExpense : handleExoenseFormSubmit}
+                onClick={isEdit ? handleUpdateExpense : handleExoenseFormSubmit}
               >
-               { isEdit ? "Update Expense" : "Save Expense" }
+                {isEdit ? "Update Expense" : "Save Expense"}
               </button>
             </div>
           </div>

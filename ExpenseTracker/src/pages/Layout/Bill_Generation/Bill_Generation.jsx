@@ -41,8 +41,6 @@ function Bill_Generation() {
     0, 0, 0, 0
   );
 
-  console.log(startDate,endDate)
-
   return { startDate, endDate };
 };
 
@@ -100,7 +98,6 @@ const getLastSixMonth = () => {
     0, 0, 0, 0
   );
 
-  console.log(startDate, endDate);
   return { startDate, endDate };
 };
 
@@ -128,7 +125,6 @@ const getLastSixMonth = () => {
     23, 59, 59, 999
   );
 
-  console.log(startDate,endDate)
   return { startDate, endDate };
 };
   
@@ -137,10 +133,13 @@ const getLastSixMonth = () => {
   const getLastMonthEntries = () => {
     const { startDate , endDate } = getLastMonth();
 
+    setCustomStart(startDate);
+    setCustomEnd(endDate);
+
     axios.post("http://127.0.0.1:3000/api/bill/generate",
      {
-        startDate,
-        endDate
+         startDate : customStart,
+          endDate : customEnd
      },
      {
       headers : {
@@ -148,10 +147,18 @@ const getLastSixMonth = () => {
       }
      }).then((res)=>{
         setData(res.data.data);
-        console.log(res.data.data)
         setShowEntries(true)
      }).catch((err)=>{
       console.log(err);
+      if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
     })
   }
 
@@ -160,12 +167,13 @@ const getLastSixMonth = () => {
       
       const { startDate , endDate } = getLastThreeMonths();
 
-      console.log(startDate , endDate)
+      setCustomStart(startDate);
+      setCustomEnd(endDate);
  
     axios.post("http://127.0.0.1:3000/api/bill/generate",
      {
-       startDate,
-       endDate
+       startDate : customStart,
+          endDate : customEnd
      },
      {
       headers : {
@@ -173,10 +181,18 @@ const getLastSixMonth = () => {
       }
      }).then((res)=>{
         setData(res.data.data);
-        console.log(res.data.data)
         setShowEntries(true)
       }).catch((err)=>{
         console.log(err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
      })
   }
 
@@ -184,10 +200,13 @@ const getLastSixMonth = () => {
   const getLastSixEntries = () => {
 
   const { startDate , endDate } = getLastSixMonth();
+
+  setCustomStart(startDate);
+  setCustomEnd(endDate);
   axios.post("http://127.0.0.1:3000/api/bill/generate",
     {
-        startDate,
-        endDate
+         startDate : customStart,
+          endDate : customEnd
     },
     {
     headers : {
@@ -199,16 +218,28 @@ const getLastSixMonth = () => {
       setShowEntries(true)
     }).catch((err)=>{
     console.log(err);
+    if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
     })
   }
 
   const getLastYearEntries = () => {
 
   const { startDate , endDate } = getLastYear();
+  setCustomStart(startDate);
+  setCustomEnd(endDate);
+
   axios.post("http://127.0.0.1:3000/api/bill/generate",
     {
-        startDate,
-        endDate
+        startDate : customStart,
+        endDate : customEnd
     },
     {
     headers : {
@@ -220,7 +251,44 @@ const getLastSixMonth = () => {
       setShowEntries(true)
     }).catch((err)=>{
       console.log(err);
+      if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
     })
+  }
+
+  const getCustomEntries = () => {
+    axios.post("http://127.0.0.1:3000/api/bill/generate",
+      {
+          startDate : customStart,
+          endDate : customEnd
+      },
+      {
+      headers : {
+        Authorization : `Bearer ${token}`
+      }
+      }).then((res)=>{
+        setData(res.data.data);
+        console.log(res.data.data)
+        setShowEntries(true)
+      }).catch((err)=>{
+        console.log(err);
+        if (err.response?.data?.msg === "Invalid token") {
+            localStorage.removeItem("token");
+            navigate("/");
+          }
+          if (err.response?.status === 401) {
+            localStorage.removeItem("token");
+            navigate("/");
+            return;
+          }
+      })
   }
 
   const getEntries = () => {
@@ -236,6 +304,10 @@ const getLastSixMonth = () => {
     if(phase === "year"){
       getLastYearEntries();
     }
+    if(phase === "custom"){
+      getCustomEntries();
+    }
+
   }
 
   const handleDownloadPDF = async () => {
@@ -251,8 +323,9 @@ const getLastSixMonth = () => {
         responseType: "blob", // VERY IMPORTANT
         headers: {
           Accept: "application/pdf",
+          Authorization : `Bearer ${token}`
         },
-      }
+      },
     );
 
     // 👇 Create PDF file from blob

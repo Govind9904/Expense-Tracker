@@ -8,7 +8,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import Chart from "react-apexcharts";
 import { color } from "chart.js/helpers";
 
-
 export default function Dashboard() {
   const [userExpense, setUserExpense] = useState([]);
   const [showMsg, setShowMsg] = useState(false);
@@ -20,15 +19,14 @@ export default function Dashboard() {
   const [graphData, setGraphData] = useState([]);
   const [category, setCategory] = useState([]);
 
-
   // Pagenation for Page and Limit
   const [listPage, setListPage] = useState(1);
-  const [totalPages , setTotalPages] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const today = new Date();
 
   const [currentDate, setCurrentDate] = useState({
-    month: new Date().getMonth(), // 0-11   
+    month: new Date().getMonth(), // 0-11
     year: new Date().getFullYear(),
   });
 
@@ -69,7 +67,7 @@ export default function Dashboard() {
   endDate.setHours(23, 59, 59, 999);
 
   useEffect(() => {
-    if (showMsg) {  
+    if (showMsg) {
       const timer = setTimeout(() => {
         setHide(true);
         setTimeout(() => setShowMsg(false), 500);
@@ -103,7 +101,6 @@ export default function Dashboard() {
         }
       )
       .then((res) => {
-        console.log(res)
         setMonthly_Expense(res.data.monthly_TotalExpense);
       })
       .catch((err) => {
@@ -133,26 +130,46 @@ export default function Dashboard() {
       })
       .catch((err) => {
         console.error("Error fetching categories:", err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
       });
   };
 
   // Get Today Expense
-  const getTodayExpense = () =>{
-    axios.post("http://127.0.0.1:3000/api/today/expense",
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((res) => {
-          setTodayExpense(res.data.todayExpense);
-        })
-        .catch((err) => {
-          console.error("Error fetching categories:", err);
-        });
-  }
+  const getTodayExpense = () => {
+    axios
+      .post(
+        "http://127.0.0.1:3000/api/today/expense",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        setTodayExpense(res.data.todayExpense);
+      })
+      .catch((err) => {
+        console.error("Error fetching categories:", err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
+      });
+  };
 
   // Graph Data && Total Monthly Expense API Fetch
 
@@ -171,7 +188,6 @@ export default function Dashboard() {
         }
       )
       .then((res) => {
-        // console.log(res);
         setGraphData(res.data.graphData);
         setMonthly_Expense(res.data.total_monthlyExpense);
       })
@@ -217,7 +233,7 @@ export default function Dashboard() {
         }
       )
       .then((res) => {
-        console.log("List",res);
+        console.log("List", res);
         setTotalPages(res.data.totalPages);
         setUserExpense(res.data.expenses);
       })
@@ -258,11 +274,19 @@ export default function Dashboard() {
         }
       )
       .then((res) => {
-        // console.log(res);
         setTotal_Expense(res.data.yearlyTotal);
       })
       .catch((err) => {
-        // console.log(err);
+        console.log(err);
+        if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
       });
   };
 
@@ -316,69 +340,66 @@ export default function Dashboard() {
       dayTotals[day - 1] += expense.amount;
     }
   });
-    const chartSeries = [
-      {
-        name: "Expense",
-        data: dayTotals,
-      },
-    ];
+  const chartSeries = [
+    {
+      name: "Expense",
+      data: dayTotals,
+    },
+  ];
 
-    const chartOptions = {
-      chart: {
-        type: "bar",
-        toolbar: { show: false },
-      },
-      xaxis: {
-        categories: dayLabels,
-        labels : {
-          style : {
-            colors: "#ffffff",   
-          }
-        }
-     },
-      yaxis: {
-        labels: {
-          style: {
-            colors: "#ffffff",   
-            fontSize: "12px",
-          },
-        },
-      },
-      tooltip: {
-        theme: "dark", 
+  const chartOptions = {
+    chart: {
+      type: "bar",
+      toolbar: { show: false },
+    },
+    xaxis: {
+      categories: dayLabels,
+      labels: {
         style: {
+          colors: "#ffffff",
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: "#ffffff",
           fontSize: "12px",
-          color : "1fa2ff"
         },
       },
-      plotOptions: {
-        bar: {
-          borderRadius: 4,
-          columnWidth: "70%",
-        },
+    },
+    tooltip: {
+      theme: "dark",
+      style: {
+        fontSize: "12px",
+        color: "1fa2ff",
       },
-      colors: ["#FF6D00"],
-      dataLabels: { enabled: false },
-      // tooltip: { enabled: true },
-      title: {
-        text: `Expenses by Day (${monthNames[currentMonth]} ${currentYear})`,
-        align: "center",
-        style : {
-          color: "#ffffffff",   
-          fontSize: "16px",
-          fontWeight: "600",
-        }
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 4,
+        columnWidth: "70%",
       },
-    };
+    },
+    colors: ["#FF6D00"],
+    dataLabels: { enabled: false },
+    // tooltip: { enabled: true },
+    title: {
+      text: `Expenses by Day (${monthNames[currentMonth]} ${currentYear})`,
+      align: "center",
+      style: {
+        color: "#ffffffff",
+        fontSize: "16px",
+        fontWeight: "600",
+      },
+    },
+  };
 
- 
-
-useEffect(() => {
-  if (startDate && endDate) {
-    getExpenseList();
-  }
-}, [listPage]);
-
+  useEffect(() => {
+    if (startDate && endDate) {
+      getExpenseList();
+    }
+  }, [listPage]);
 
   return (
     <>
@@ -404,7 +425,6 @@ useEffect(() => {
 
         {/* Cards */}
         <div className="dashboard-cards">
-         
           <div className="dashboard-card">
             <div className="card-label">Today Expense</div>
             <div className="card-value">
@@ -425,7 +445,6 @@ useEffect(() => {
               {"\u20B9"} {Total_Expense}
             </div>
           </div>
-
         </div>
         {/* Expense Graph */}
         <div className="dashboard-graph">
@@ -477,8 +496,6 @@ useEffect(() => {
             height={280}
           />
         </div>
-
-       
 
         {/* Expense List */}
         <div className="dashboard-expense-list">

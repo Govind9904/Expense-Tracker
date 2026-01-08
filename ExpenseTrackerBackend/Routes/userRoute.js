@@ -33,6 +33,9 @@ router.post("/add/expense", authenticateToken, ExpenseController.createExpense);
 //update Expense 
 router.post("/update/expense/:id",authenticateToken,ExpenseController.updateExpense);
 
+// Delete Expense
+router.post("/delete/expense/:id",authenticateToken,ExpenseController.deleteExpense);
+
 router.post('/expenses/monthly',authenticateToken,ExpenseController.getMonthlyDataforYear);
 
 router.post("/report/expense/year",authenticateToken,ExpenseController.getYearlyTotalforReport);
@@ -44,7 +47,7 @@ router.post("/bill/generate",authenticateToken , ExpenseController.getEntriesfor
 router.post("/register", userController.register);
 router.post("/login", userController.login);
 
-router.post("/download/pdf",ExpenseController.downloadPdf);
+router.post("/download/pdf",authenticateToken,ExpenseController.downloadPdf);
 
 // Get User Profile
 router.post("/get/user/profile",authenticateToken,ExpenseController.getUserProfile);

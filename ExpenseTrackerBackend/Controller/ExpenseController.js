@@ -504,6 +504,7 @@ exports.downloadPdf = async (req, res) => {
   try {
     const { reportInfo = {}, submittedBy = {}, submittedTo = {}, data , startDate , endDate  } = req.body;
 
+    console.log(startDate,endDate)
     // Safety defaults
     const submittedByName = submittedBy.name || "-";
     const submittedByDept = submittedBy.department || "-";
@@ -528,7 +529,7 @@ exports.downloadPdf = async (req, res) => {
     <head>
       <style>
         body { font-family: Arial; font-size: 12px; }
-        h1 { text-align: center; }
+        h1 { text-align: center; color :" #1f4e79" }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #333; padding: 6px; text-align: left; }
         th { background: #1f4e79; color: white; }
@@ -546,18 +547,13 @@ exports.downloadPdf = async (req, res) => {
       <td>End Date</td><td>${new Date(endDate).toLocaleDateString()}</td>
     </tr>
     </table>
-
-    <div class="section-title">Submitted By</div>
-    <table>
-    <tr>
-      <td>${data[0].user?.first_name} ${data[0].user?.last_name}</td>
-    </tr>
-    </table>
+    
 
     <div class="section-title">Expense Details</div>
     <table>
     <thead>
     <tr>
+      <th>No</th>
       <th>Date</th>
       <th>Description</th>
       <th>Category</th>
@@ -569,8 +565,9 @@ exports.downloadPdf = async (req, res) => {
       Array.isArray(data) && data.length > 0
         ? data
             .map(
-              (e) => `
+              (e,id) => `
     <tr>
+      <td>${id + 1}</td>
       <td>${new Date(e.date).toLocaleDateString() || "-"}</td>
       <td>${e.description || "-"}</td>
       <td>${e.category?.name || "-"}</td>
@@ -585,9 +582,6 @@ exports.downloadPdf = async (req, res) => {
 
     <h3 style="text-align:right">Total: ₹${totalAmount}</h3>
 
-    <p style="text-align:center;font-size:10px">
-      *DON'T FORGET TO ATTACH ALL RECEIPTS*
-    </p>
 
     </body>
     </html>
@@ -740,3 +734,33 @@ exports.updateExpense = async (req,res) => {
 };
 
 
+exports.deleteExpense = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const expenseId = req.params.id;
+
+    const expense = await Expense.findOne({
+      where: { id: expenseId, userId },
+    });
+
+    if (!expense) {
+      return res.status(404).json({
+        success: false,
+        msg: "Expense not found",
+      });
+    }
+
+    await expense.destroy();
+
+    res.status(200).json({
+      success: true,
+      msg: "Expense deleted successfully",
+    });
+  } catch (err) {
+    console.error("Delete Expense Error:", err);
+    res.status(500).json({
+      success: false,
+      msg: "Server error",
+    });
+  }
+};

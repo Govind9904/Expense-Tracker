@@ -26,6 +26,15 @@ function Profile() {
       setUser(res.data.data[0]);
     } catch (err) {
       console.log(err);
+      if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
     }
   };
 
@@ -51,6 +60,15 @@ function Profile() {
     setEdit(false);
   } catch (err) {
     console.error("Update failed:", err.response?.data || err.message);
+    if (err.response?.data?.msg === "Invalid token") {
+          localStorage.removeItem("token");
+          navigate("/");
+        }
+        if (err.response?.status === 401) {
+          localStorage.removeItem("token");
+          navigate("/");
+          return;
+        }
   }
 };
 
