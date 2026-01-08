@@ -6,9 +6,8 @@ import "./Report.css";
 import Chart from "react-apexcharts";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import spendingImg  from "../../../assets/spending.png"
-import categories from "../../../assets/categories.png"
-import report from "../../../assets/report.png"
+import spendingImg from "../../../assets/spending.png";
+import categories from "../../../assets/categories.png";
 
 
 export default function Reports() {
@@ -21,9 +20,9 @@ export default function Reports() {
   const [endDate, setEndDate] = useState(today);
 
   const [charData, setChartData] = useState([]);
-  const [category,setCategory] = useState([]);
-  const [filterCategory,setFilterCategory] = useState("All");
-  const [overallTotal,setOverAllTotal] = useState(0);
+  const [category, setCategory] = useState([]);
+  const [filterCategory, setFilterCategory] = useState("All");
+  const [overallTotal, setOverAllTotal] = useState(0);
   const token = localStorage.getItem("token");
 
   const [lineChartYear, setLineChartYear] = useState(new Date()); // year selection
@@ -33,20 +32,28 @@ export default function Reports() {
 
   const [userExpense, setUserExpense] = useState([]);
   const [listPage, setListPage] = useState(1);
-  const [totalPages , setTotalPages] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const [isEdit,setIsEdit] = useState(false);
+  const [editExpenseId,setEditExpenseId] = useState(null);
+
+  const [currentDate, setCurrentDate] = useState({
+    month: new Date().getMonth(), // 0-11
+    year: new Date().getFullYear(),
+  });
 
   const navigate = useNavigate();
 
   // Expense form state
-    const [expenseFormData, setExpenseFormData] = useState({
-      date: "",
-      description: "",
-      amount: "",
-      categoryId: "",
-      payment_mode: "",
-    });
+  const [expenseFormData, setExpenseFormData] = useState({
+    date: "",
+    description: "",
+    amount: "",
+    categoryId: "",
+    payment_mode: "",
+  });
 
-   // Expense form change handler
+  // Expense form change handler
   const handleChnageExpense = (e) => {
     const { name, value } = e.target;
     setExpenseFormData((prevData) => {
@@ -57,9 +64,42 @@ export default function Reports() {
     });
   };
 
-   // Expense form submit handler
-  const handleExoenseFormSubmit = () => {
+  // Handle Forward and Backward Month on the Graph
 
+  const handleClickon = (direction) => {
+    setCurrentDate(({ month, year }) => {
+      let newMonth = month;
+      let newYear = year;
+
+      if (direction === "Back") {
+        newMonth--;
+        if (newMonth < 0) {
+          newMonth = 11;
+          newYear--;
+        }
+      } else {
+        newMonth++;
+        if (newMonth > 11) {
+          newMonth = 0;
+          newYear++;
+        }
+      }
+
+      return { month: newMonth, year: newYear };
+    });
+  };
+
+  const closeModal = () => {
+    const modalEl = document.getElementById("addExpenseModal");
+    const modalInstance = window.bootstrap.Modal.getInstance(modalEl);
+
+    if (modalInstance) {
+      modalInstance.hide();
+    }
+  };
+
+  // Expense form submit handler
+  const handleExoenseFormSubmit = () => {
     axios
       .post("http://127.0.0.1:3000/api/add/expense", expenseFormData, {
         headers: {
@@ -70,9 +110,6 @@ export default function Reports() {
         // Refresh expense list
         setUserExpense((prevExpenses) => [res.data.expense, ...prevExpenses]);
         getExpenseList();
-        getExpenseAndCategories();
-        getGraphData();
-        getTodayExpense();
         // Auto close modal
         closeModal();
         // Reset form
@@ -94,34 +131,30 @@ export default function Reports() {
     categoryName: "",
   });
 
-    // Category form Change Handler
-    const handleCategoryChange = (e) =>{
-       const { name , value } = e.target;
-       setCategoryForm((prev)=>({
-        ...prev,
-        [name] : value
-       }))
-    }
-  
-    // Add Categort API
-    const handleCategorySubmit = () => {
+  // Category form Change Handler
+  const handleCategoryChange = (e) => {
+    const { name, value } = e.target;
+    setCategoryForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Add Categort API
+  const handleCategorySubmit = () => {
     axios
-      .post(
-        "http://127.0.0.1:3000/api/add/category",
-        categoryForm,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .post("http://127.0.0.1:3000/api/add/category", categoryForm, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         // Refresh category list
         setCategory((prev) => [...prev, res.data.category]);
-  
+
         // Reset form
         setCategoryForm({ name: "" });
-  
+
         // Close modal
         const modalEl = document.getElementById("addCategoryModal");
         const modal = window.bootstrap.Modal.getInstance(modalEl);
@@ -134,42 +167,41 @@ export default function Reports() {
       });
   };
 
-
-  
-  
   const getCategories = () => {
     axios
-    .post(
-      "http://127.0.0.1:3000/api/categories",
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-    .then((res) => {
-      setCategory(res.data?.categories);
-    })
-    .catch((err) => {
-      console.error("Error fetching categories:", err);
-    });
-  }
-  
-  const listStartDate = new Date(startDate.getFullYear(),startDate.getMonth(),1);
+      .post(
+        "http://127.0.0.1:3000/api/categories",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        setCategory(res.data?.categories);
+      })
+      .catch((err) => {
+        console.error("Error fetching categories:", err);
+      });
+  };
+
+  // Start of current month
+  const listStartDate = new Date(currentDate.year, currentDate.month, 1);
   listStartDate.setHours(0, 0, 0, 0);
 
   // End of current month
-  const listEndDate = new Date(endDate.getFullYear(),endDate.getMonth() + 1,0);
+  const listEndDate = new Date(currentDate.year, currentDate.month + 1, 0);
   listEndDate.setHours(23, 59, 59, 999);
 
   const getExpenseList = () => {
     axios
-      .post("http://127.0.0.1:3000/api/expenses",
+      .post(
+        "http://127.0.0.1:3000/api/expenses",
         {
           listPage,
-          startDate : listStartDate ,
-          endDate : listEndDate 
+          startDate: listStartDate,
+          endDate: listEndDate,
         },
         {
           headers: {
@@ -196,84 +228,95 @@ export default function Reports() {
         }
       });
   };
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     if (!token) {
       navigate("/");
     }
-
     getCategories();
     getDataforLineChart();
     getExpenseList();
-  },[]);
+  }, []);
 
-  const getPieChartDataforYear = () =>{
-   
-    axios.post("http://127.0.0.1:3000/api/report/expense/year",
-    {
-       "year" : year.getFullYear(),
-       "filterCategory" : filterCategory
-    },
-    {
-       headers : {
-        Authorization : `Bearer ${token}`
-       }
-    })
-    .then((res)=>{
-      setChartData(res.data.data);
-      setOverAllTotal(res.data.overallTotal);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-  }
+  useEffect(() => {
+    getExpenseList();
+  }, [currentDate.month, currentDate.year]);
+
+  const getPieChartDataforYear = () => {
+    axios
+      .post(
+        "http://127.0.0.1:3000/api/report/expense/year",
+        {
+          year: year.getFullYear(),
+          filterCategory: filterCategory,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        setChartData(res.data.data);
+        setOverAllTotal(res.data.overallTotal);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   // Chart Data for Month
 
-  const getPieChartDataforMonth = () =>{
-    axios.post("http://127.0.0.1:3000/api/report/expense/month",
-      {
-        "month" : month.getMonth() + 1,
-        "year" : month.getFullYear(),
-        "filterCategory" : filterCategory
-      },
-      {
-        headers : {
-          Authorization : `Bearer ${token}`
+  const getPieChartDataforMonth = () => {
+    axios
+      .post(
+        "http://127.0.0.1:3000/api/report/expense/month",
+        {
+          month: month.getMonth() + 1,
+          year: month.getFullYear(),
+          filterCategory: filterCategory,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      })
-      .then((res)=>{
+      )
+      .then((res) => {
         setChartData(res.data.data);
         setOverAllTotal(res.data.overallTotal);
-      }).catch((err)=>{
-        console.log(err);
       })
-  }
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
-  
-  const getPieChartDataforDate = () =>{
-    axios.post("http://127.0.0.1:3000/api/report/expense/date",
-      {
-        startDate,
-        endDate,
-        "filterCategory" : filterCategory
-      },
-      {
-        headers : {
-          Authorization : `Bearer ${token}`
+  const getPieChartDataforDate = () => {
+    axios
+      .post(
+        "http://127.0.0.1:3000/api/report/expense/date",
+        {
+          startDate,
+          endDate,
+          filterCategory: filterCategory,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-    })
-    .then((res)=>{
-      setChartData(res.data.data);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-  }
+      )
+      .then((res) => {
+        setChartData(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const getPreviousMonth = () => {
     const now = new Date();
-    let month = now.getMonth(); 
+    let month = now.getMonth();
     let year = now.getFullYear();
 
     if (month === 0) {
@@ -284,208 +327,205 @@ export default function Reports() {
     return { month, year };
   };
 
+  // ---- for Previous Month -----
 
-  // ---- for Previous Month ----- 
+  const getPieChartDataforPreviousMonth = () => {
+    const { month, year } = getPreviousMonth();
 
-  const getPieChartDataforPreviousMonth = () =>{
-    const {month ,year } = getPreviousMonth();
+    axios
+      .post(
+        "http://127.0.0.1:3000/api/report/expense/month",
+        {
+          month,
+          year,
+          filterCategory: filterCategory,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        setChartData(res.data.data);
+        setOverAllTotal(res.data.overallTotal);
+      })
+      .catch((err) => {
+        if (err.status === 403) {
+          navigate("/");
+        } else {
+          console.log(err);
+        }
+      });
+  };
 
-   axios.post("http://127.0.0.1:3000/api/report/expense/month",
-    {
-        month,
-        year,
-        "filterCategory" : filterCategory
-    },
-    {
-       headers : {
-        Authorization : `Bearer ${token}`
-       }
-    })
-    .then((res)=>{
-      setChartData(res.data.data);
-      setOverAllTotal(res.data.overallTotal);
-    })
-    .catch((err)=>{
-      if(err.status === 403){
-        navigate("/");
-      }else{
-        console.log(err);
-      }
-    })
-  }
-  
-  // ---- for Last Six Month ---- 
-  
+  // ---- for Last Six Month ----
+
   const getLastSixMonth = () => {
     const today = new Date();
 
-  // End date is today
-  const endDate = new Date(today);
-  endDate.setHours(23, 59, 59, 999);
+    // End date is today
+    const endDate = new Date(today);
+    endDate.setHours(23, 59, 59, 999);
 
-  // Start date is 6 months ago
-  const startDate = new Date(today);
-  startDate.setMonth(startDate.getMonth() - 6);
-  startDate.setHours(0, 0, 0, 0);
+    // Start date is 6 months ago
+    const startDate = new Date(today);
+    startDate.setMonth(startDate.getMonth() - 6);
+    startDate.setHours(0, 0, 0, 0);
 
-  return { startDate, endDate };
-  }
+    return { startDate, endDate };
+  };
 
-  const getPieChartDataforLastSixMonth = () =>{
-
+  const getPieChartDataforLastSixMonth = () => {
     const { startDate, endDate } = getLastSixMonth();
 
-    axios.post("http://127.0.0.1:3000/api/report/expense/date",
-    {
-        startDate,
-        endDate,
-        "filterCategory" : filterCategory
-    },
-    {
-       headers : {
-        Authorization : `Bearer ${token}`
-       }
+    axios
+      .post(
+        "http://127.0.0.1:3000/api/report/expense/date",
+        {
+          startDate,
+          endDate,
+          filterCategory: filterCategory,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        setChartData(res.data.data);
+        setOverAllTotal(res.data.overallTotal);
       })
-      .then((res)=>{
-      setChartData(res.data.data);
-      setOverAllTotal(res.data.overallTotal);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-  }
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
-  // ----------- For Last Year ------------ 
+  // ----------- For Last Year ------------
 
   const getLastYear = () => {
-    
     const today = new Date();
     const last_year = today.getFullYear() - 1;
 
     return last_year;
-  }
+  };
 
+  const getPieChartDataforLastYear = () => {
+    const last_year = getLastYear();
 
-  const getPieChartDataforLastYear = () =>{
-   
-   const last_year= getLastYear();
-
-    axios.post("http://127.0.0.1:3000/api/report/expense/year",
-    {
-      "year" : last_year,
-      "filterCategory" : filterCategory
-    },
-    {
-       headers : {
-        Authorization : `Bearer ${token}`
-       }
-      })
-      .then((res)=>{
+    axios
+      .post(
+        "http://127.0.0.1:3000/api/report/expense/year",
+        {
+          year: last_year,
+          filterCategory: filterCategory,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
         setChartData(res.data.data);
         setOverAllTotal(Number(res.data.overallTotal) || 0);
       })
-      .catch((err)=>{
+      .catch((err) => {
         console.log(err);
-      })
-    }
+      });
+  };
 
   useEffect(() => {
     if (filter === "year") {
       getPieChartDataforYear();
     }
-  
+
     if (filter === "month") {
       getPieChartDataforMonth();
     }
-  
+
     if (filter === "date") {
       getPieChartDataforDate();
     }
-  
-    if(filter === "previousMonth"){
+
+    if (filter === "previousMonth") {
       getPieChartDataforPreviousMonth();
     }
-    
-    if(filter === "sixMonth"){
+
+    if (filter === "sixMonth") {
       getPieChartDataforLastSixMonth();
     }
-    
-    if(filter === "lastYear"){
+
+    if (filter === "lastYear") {
       getPieChartDataforLastYear();
     }
-  }, [filter, year, month, startDate,endDate,filterCategory]);
-  
-  
-    // 1️⃣ normalize totals (API-safe)
-    const overallTotalSafe = Number(overallTotal) || 0;
+  }, [filter, year, month, startDate, endDate, filterCategory]);
 
-    // calculate filtered total only when a category is selected
-    const filteredTotal =
-      filterCategory === "All"
-        ? 0
-        : charData.reduce(
-            (acc, item) => acc + Number(item.total || 0),
-            0
-          );
+  // 1️⃣ normalize totals (API-safe)
+  const overallTotalSafe = Number(overallTotal) || 0;
 
-    // remaining amount
-    const remainingTotal = Math.max(
-      overallTotalSafe - filteredTotal,
-      0
-    );
+  // calculate filtered total only when a category is selected
+  const filteredTotal =
+    filterCategory === "All"
+      ? 0
+      : charData.reduce((acc, item) => acc + Number(item.total || 0), 0);
 
+  // remaining amount
+  const remainingTotal = Math.max(overallTotalSafe - filteredTotal, 0);
 
-    // 2️⃣ base pie data (All categories)
-    const pieData = {
-      labels: charData.map((item) => item.category),
-      data: charData.map((item) => Number(item.total) || 0),
-      colors: [
-        "#FF6384",
-        "#36A2EB",
-        "#FFCE56",
-        "#8AFF33",
-        "#FF33F6",
-        "#33FFF3",
-      ],
-    };
+  // 2️⃣ base pie data (All categories)
+  const pieData = {
+    labels: charData.map((item) => item.category),
+    data: charData.map((item) => Number(item.total) || 0),
+    colors: ["#FF6384", "#36A2EB", "#FFCE56", "#8AFF33", "#FF33F6", "#33FFF3"],
+  };
 
-    // 3️⃣ dynamic chart values
-    let chartSeries = [];
-    let chartLabels = [];
-    let chartColors = [];
+  // 3️⃣ dynamic chart values
+  let chartSeries = [];
+  let chartLabels = [];
+  let chartColors = [];
 
-    if (filterCategory === "All") {
-      chartSeries = pieData.data;
-      chartLabels = pieData.labels;
-      chartColors = pieData.colors;
-    } else if (filteredTotal > 0) {
-      chartSeries = [filteredTotal, remainingTotal];
-      chartLabels = [filterCategory, "Other Expenses"];
-      chartColors = ["#36A2EB", "#E0E0E0"];
-    }
-    else if (filteredTotal === 0) {
-      chartSeries = [filteredTotal, remainingTotal];
-      chartLabels = [filterCategory, "Other Expenses"];
-      chartColors = ["#36A2EB", "#E0E0E0"];
-    }
+  if (filterCategory === "All") {
+    chartSeries = pieData.data;
+    chartLabels = pieData.labels;
+    chartColors = pieData.colors;
+  } else if (filteredTotal > 0) {
+    chartSeries = [filteredTotal, remainingTotal];
+    chartLabels = [filterCategory, "Other Expenses"];
+    chartColors = ["#36A2EB", "#E0E0E0"];
+  } else if (filteredTotal === 0) {
+    chartSeries = [filteredTotal, remainingTotal];
+    chartLabels = [filterCategory, "Other Expenses"];
+    chartColors = ["#36A2EB", "#E0E0E0"];
+  }
 
-    // 4️⃣ chart options (ApexCharts)
-    const chartOptions = {
-      labels: chartLabels,
-      colors: chartColors,
-      legend: { position: "bottom" },
-      dataLabels: {
-        enabled: true,
-        formatter: (val) => `${val.toFixed(2)}%`,
-      },
-    };
+  // 4️⃣ chart options (ApexCharts)
+  const chartOptions = {
+    labels: chartLabels,
+    colors: chartColors,
+    legend: { position: "bottom" },
+    dataLabels: {
+      enabled: true,
+      formatter: (val) => `${val.toFixed(2)}%`,
+    },
+  };
 
+  // --------------------------- Line Chart -----------------------------
 
-    // --------------------------- Line Chart -----------------------------
-
-      const monthNames = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
   // Fetch data from API
@@ -560,53 +600,90 @@ export default function Reports() {
     });
   }, [lineChartData]); // runs whenever data changes
 
-  // Expense List 
-   const handleList = (Page) => {
+  // Expense List
+  const handleList = (Page) => {
     if (Page === "Next") {
-      setListPage(prev => {
+      setListPage((prev) => {
         const nextPage = prev + 1;
         setListPage(nextPage);
         getExpenseList();
       });
-    } 
-    else if (Page === "Back") {
-      setListPage(prev => {
+    } else if (Page === "Back") {
+      setListPage((prev) => {
         if (prev === 1) return prev;
         const prevPage = prev - 1;
         setListPage(prevPage);
         getExpenseList();
       });
-    } 
-    else {
+    } else {
       console.log(Page);
     }
   };
 
   useEffect(() => {
-      getExpenseList();
+    getExpenseList();
   }, [listPage]);
+
+
+  const handleEdit = (expense) => {
+    setIsEdit(true);
+    setEditExpenseId(expense.id);
+
+    console.log(expense.category?.id);
+    setExpenseFormData({
+      date:expense.date.split("T")[0],
+      description:expense.description,
+      amount:expense.amount,
+      categoryId:expense.category?.id,
+      payment_mode:expense.payment_mode,
+    });
+  }
+
+  const handleUpdateExpense = () => {
+    axios.post(`http://127.0.0.1:3000/api/update/expense/${editExpenseId}`,expenseFormData,
+      {
+        headers : {
+          Authorization : `Bearer ${token}`
+        },
+      }).then((res)=>{
+        console.log(res)
+        getExpenseList();
+        getPieChartDataforMonth();
+        getDataforLineChart();
+        closeModal();
+        // Reset form
+        setExpenseFormData({
+          date: "",
+          description: "",
+          amount: "",
+          categoryId: "",
+          payment_mode: "",
+        });
+      }).catch((err)=>{
+        console.log(err);
+      })
+    
+  }
 
   return (
     <>
-    <div className="report-page">
-
-      <div className="repor-tpage-graphs">
-        <div className="report-header">
-          <div className="select-header">
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            >
-              <option value="year">Year</option>
-              <option value="month">Month</option>
-              <option value="date">Date</option>
-              <option value="previousMonth">Previous Month</option>
-              <option value="sixMonth">Last 6 Months</option>
-              <option value="lastYear">Last Year</option>
-            </select>
-          </div>
+      <div className="report-page">
+        <div className="repor-tpage-graphs">
+          <div className="report-header">
+            <div className="select-header">
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+              >
+                <option value="year">Year</option>
+                <option value="month">Month</option>
+                <option value="date">Date</option>
+                <option value="previousMonth">Previous Month</option>
+                <option value="sixMonth">Last 6 Months</option>
+                <option value="lastYear">Last Year</option>
+              </select>
+            </div>
             <div className="filter-inputs">
-
               {filter === "year" && (
                 <DatePicker
                   selected={year}
@@ -622,166 +699,267 @@ export default function Reports() {
                   selected={month}
                   onChange={(date) => setMonth(date)}
                   showMonthYearPicker
-                  dateFormat="MMM     yyyy" 
+                  dateFormat="MMM     yyyy"
                   className="custom-input"
                 />
               )}
 
               {filter === "date" && (
                 <div className="date-range">
-                <DatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                  selectsStart
-                  startDate={startDate}
-                  dateFormat="yyyy-MM-dd"
-                  placeholderText="Start Date"
-                  className="custom-input"
-                />
-                <span>to</span>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    selectsStart
+                    startDate={startDate}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="Start Date"
+                    className="custom-input"
+                  />
+                  <span>to</span>
 
-                <DatePicker
-                  selected={endDate}
-                  onChange={(date) => setEndDate(date)}
-                  selectsEnd
-                  endDate={endDate}
-                  dateFormat="yyyy-MM-dd"
-                  placeholderText="End Date"
-                  className="custom-input"
-                />
+                  <DatePicker
+                    selected={endDate}
+                    onChange={(date) => setEndDate(date)}
+                    selectsEnd
+                    endDate={endDate}
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="End Date"
+                    className="custom-input"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="charts">
+            <div className="select-category">
+              <label htmlFor="">Category : </label>
+              <select
+                className="categorySelector"
+                onChange={(e) => setFilterCategory(e.target.value)}
+              >
+                <option value="All">All Category</option>
+                {category.map((item) => (
+                  <option key={item.id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="pieChart">
+              <div
+                style={{
+                  width: "300px",
+                  alignItems: "start",
+                  height: "350px",
+                  maxWidth: "400px",
+                  maxHeight: "400px",
+                }}
+              >
+                {chartSeries.length > 0 && (
+                  <Chart
+                    type="pie"
+                    series={chartSeries}
+                    options={chartOptions}
+                    height="100%"
+                  />
+                )}
               </div>
-              )}
-          </div>
-        </div>
-            
-        <div className="charts">
-          <div className="select-category">
-            <label htmlFor="">Category : </label>
-            <select className="categorySelector" onChange={(e)=>setFilterCategory(e.target.value)}>
-              <option value="All">All Category</option>
-              {category.map((item) => (
-                <option key={item.id} value={item.name}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="pieChart">
-            <div style={{ width: "350px" , alignItems : "start", height : "390px", maxWidth : "500px" , maxHeight : "500px" }}>
-              {chartSeries.length > 0 && (
-                <Chart
-                  type="pie"
-                  series={chartSeries}
-                  options={chartOptions}
-                  height="100%"
-                />
-              )}
             </div>
           </div>
         </div>
+
+        <div className="line-chart">
+          <Chart
+            options={lineChartOptions}
+            series={lineChartSeries}
+            type="line"
+            height={400}
+            width={700}
+          />
+        </div>
       </div>
-        
+
+      {/* Add Buttons for Expense */}
+      <div className="dashboard-card-expense">
+        <div className="dashboard-card-label">Quick Access</div>
+
+        <div className="dashboard-card-all">
+          <div className="">
+            <button
+              className="add-expense-btn"
+              data-bs-toggle="modal"
+              data-bs-target="#addExpenseModal"
+            >
+              <img className="quick-access" src={spendingImg} alt="" /> New
+              Expense
+            </button>
+          </div>
+          <div>
+            <button
+              className="add-expense-btn"
+              data-bs-toggle="modal"
+              data-bs-target="#addCategoryModal"
+            >
+              <img className="quick-access" src={categories} alt="" /> Category
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Expense List */}
-        <div className="expense-list">
-          <div className="expense-list-header">
-            <div className="expense-list-title">Latest Expense of This Month</div>
-            <div className="list-icon">
-              <button onClick={() => handleList("Back")} disabled={listPage === 1}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#FF6D00"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-arrow-left-icon lucide-arrow-left"
-                >
-                  <path d="m12 19-7-7 7-7" />
-                  <path d="M19 12H5" />
-                </svg>
-              </button>
-              <button onClick={() => handleList("Next")} disabled={listPage === totalPages}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#FF6D00"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-arrow-right-icon lucide-arrow-right"
-                >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </button>
-            </div>
+      <div className="expense-list">
+        <div className="expense-list-header">
+          <div className="expense-list-title">
+            Expense of {monthNames[currentDate.month]} {currentDate.year}
           </div>
-          <table className="expense-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Payment</th>
-                <th>Payment Mode</th>
+          <div className="graph-back-next-btn">
+            <button
+              className="graph-nav-btn"
+              onClick={() => handleClickon("Back")}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#FF6D00"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-chevron-left-icon lucide-chevron-left"
+              >
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+            </button>
+            <div className="listPage">Month</div>
+            <button
+              className="graph-nav-btn"
+              onClick={() => handleClickon("Next")}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#FF6D00"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-chevron-right-icon lucide-chevron-right"
+              >
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <table className="expense-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Payment</th>
+              <th>Payment Mode</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {userExpense.map((expense) => (
+              <tr key={expense.id}>
+                <td>{new Date(expense.date).toLocaleDateString()}</td>
+                <td>{expense.description}</td>
+                <td>{expense?.category?.name}</td>
+                <td>₹{expense.amount}</td>
+                <td>{expense.payment_mode}</td>
+                <td className="table-edit-delete-svg">
+                  {/* EDIT */}
+                  <svg onClick={()=>handleEdit(expense)}
+                    data-bs-toggle="modal"
+                    data-bs-target="#addExpenseModal"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#FF6D00"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-square-pen"
+                  >
+                    <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z" />
+                  </svg>
+
+                  {/* DELETE */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="red"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-trash-2"
+                  >
+                    <path d="M10 11v6" />
+                    <path d="M14 11v6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                    <path d="M3 6h18" />
+                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {userExpense.map((expense) => (
-                <tr key={expense.id}>
-                  <td>{new Date(expense.date).toLocaleDateString()}</td>
-                  <td>{expense.description}</td>
-                  <td>{expense?.category?.name}</td>
-                  <td>₹{expense.amount}</td>
-                  <td>{expense.payment_mode}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            ))}
+          </tbody>
+        </table>
+        <div className="list-icon">
+          <button onClick={() => handleList("Back")} disabled={listPage === 1}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FF6D00"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-left-icon lucide-arrow-left"
+            >
+              <path d="m12 19-7-7 7-7" />
+              <path d="M19 12H5" />
+            </svg>
+          </button>
+          <label htmlFor="">Page</label>
+          <button
+            onClick={() => handleList("Next")}
+            disabled={listPage === totalPages}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#FF6D00"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-arrow-right-icon lucide-arrow-right"
+            >
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </button>
         </div>
-    </div>
-    <div className="line-chart">
-      <Chart
-          options={lineChartOptions}
-          series={lineChartSeries}
-          type="line"
-          height={320}
-          width={800}
-        />
       </div>
-
-       {/* Add Buttons for Expense */}
-        <div className="dashboard-card-expense">
-          <div className="dashboard-card-label">Quick Access</div>
-
-          <div className="dashboard-card-all">
-            <div className="">
-             <button className="add-expense-btn" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
-               <img className="quick-access" src={spendingImg} alt="" /> New Expense
-              </button>
-            </div>
-            <div>
-             <button className="add-expense-btn" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-              <img className="quick-access" src={categories} alt="" />  Category
-              </button>
-            </div>
-            <div>
-              <Link to="/report">
-                <button className="add-expense-btn">
-                  <img className="quick-access" src={report} alt="" />  Report
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
-
 
       {/* Expense Modal */}
       {/* Add Expense Bootstrap Modal */}
@@ -797,7 +975,7 @@ export default function Reports() {
             {/* Header */}
             <div className="modal-header">
               <h5 className="modal-title" id="addExpenseModalLabel">
-                Add New Expense
+                {isEdit ? "Update Expense" : "Add New Expense"}
               </h5>
               <button
                 type="button"
@@ -890,9 +1068,9 @@ export default function Reports() {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={handleExoenseFormSubmit}
+                onClick={ isEdit ? handleUpdateExpense : handleExoenseFormSubmit}
               >
-                Save Expense
+               { isEdit ? "Update Expense" : "Save Expense" }
               </button>
             </div>
           </div>
@@ -900,10 +1078,14 @@ export default function Reports() {
       </div>
 
       {/* Category Modal */}
-      <div className="modal fade" id="addCategoryModal" tabIndex="-1" aria-hidden="true">
+      <div
+        className="modal fade"
+        id="addCategoryModal"
+        tabIndex="-1"
+        aria-hidden="true"
+      >
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
-
             {/* Header */}
             <div className="modal-header">
               <h5 className="modal-title">Add Category</h5>
@@ -931,10 +1113,7 @@ export default function Reports() {
 
             {/* Footer */}
             <div className="modal-footer">
-              <button
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
+              <button className="btn btn-secondary" data-bs-dismiss="modal">
                 Cancel
               </button>
               <button
@@ -944,7 +1123,6 @@ export default function Reports() {
                 Save Category
               </button>
             </div>
-
           </div>
         </div>
       </div>

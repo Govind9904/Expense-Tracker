@@ -114,7 +114,7 @@
 
 /* Full page layout */
 .billgen-fullpage {
-  min-height: 100vh;
+  min-height: 80vh;
   background: #121212;
   display: flex;
   flex-direction: column;

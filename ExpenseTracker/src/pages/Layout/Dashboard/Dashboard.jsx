@@ -6,6 +6,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 // For chart rendering
 import Chart from "react-apexcharts";
+import { color } from "chart.js/helpers";
 
 
 export default function Dashboard() {
@@ -24,17 +25,7 @@ export default function Dashboard() {
   const [listPage, setListPage] = useState(1);
   const [totalPages , setTotalPages] = useState(0);
 
-
-
-  // Pie Chart Data
-  const [pieCharData, setPieChartData] = useState([]);
-  const [pieCategory,setPieCategory] = useState([]);
-  const [filterCategory,setFilterCategory] = useState("All");
-  const [overallTotal,setOverAllTotal] = useState(0);
-  const [filter, setFilter] = useState("month");
-   const today = new Date();
-  const [year, setYear] = useState(today);
-  const [month, setMonth] = useState(today);
+  const today = new Date();
 
   const [currentDate, setCurrentDate] = useState({
     month: new Date().getMonth(), // 0-11   
@@ -354,7 +345,7 @@ export default function Dashboard() {
         },
       },
       tooltip: {
-        theme: "light", 
+        theme: "dark", 
         style: {
           fontSize: "12px",
           color : "1fa2ff"
@@ -366,7 +357,7 @@ export default function Dashboard() {
           columnWidth: "70%",
         },
       },
-      colors: ["#1fa2ff"],
+      colors: ["#FF6D00"],
       dataLabels: { enabled: false },
       // tooltip: { enabled: true },
       title: {
@@ -388,282 +379,6 @@ useEffect(() => {
   }
 }, [listPage]);
 
-
-// Pie Chart API or Functions for Data
-
-  const getPieChartDataforYear = () =>{
-   
-    axios.post("http://127.0.0.1:3000/api/report/expense/year",
-    {
-       "year" : year.getFullYear(),
-       "filterCategory" : filterCategory
-    },
-    {
-       headers : {
-        Authorization : `Bearer ${token}`
-       }
-    })
-    .then((res)=>{
-      setPieChartData(res.data.data);
-      setOverAllTotal(res.data.overallTotal);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-  }
-
-  // Chart Data for Month
-
-  const getPieChartDataforMonth = () =>{
-    axios.post("http://127.0.0.1:3000/api/report/expense/month",
-      {
-        "month" : month.getMonth() + 1,
-        "year" : month.getFullYear(),
-        "filterCategory" : filterCategory
-      },
-      {
-        headers : {
-          Authorization : `Bearer ${token}`
-        }
-      })
-      .then((res)=>{
-        setPieChartData(res.data.data);
-        setOverAllTotal(res.data.overallTotal);
-      }).catch((err)=>{
-        console.log(err);
-      })
-  }
-
-  
-  const getPieChartDataforDate = () =>{
-    axios.post("http://127.0.0.1:3000/api/report/expense/date",
-      {
-        startDate,
-        endDate,
-        "filterCategory" : filterCategory
-      },
-      {
-        headers : {
-          Authorization : `Bearer ${token}`
-        }
-    })
-    .then((res)=>{
-      setPieChartData(res.data.data);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-  }
-
-  const getPreviousMonth = () => {
-    const now = new Date();
-    let month = now.getMonth(); 
-    let year = now.getFullYear();
-
-    if (month === 0) {
-      month = 12;
-      year = year - 1;
-    }
-
-    return { month, year };
-  };
-
-
-  // ---- for Previous Month ----- 
-
-  const getPieChartDataforPreviousMonth = () =>{
-    const {month ,year } = getPreviousMonth();
-
-   axios.post("http://127.0.0.1:3000/api/report/expense/month",
-    {
-        month,
-        year,
-        "filterCategory" : filterCategory
-    },
-    {
-       headers : {
-        Authorization : `Bearer ${token}`
-       }
-    })
-    .then((res)=>{
-      setPieChartData(res.data.data);
-      setOverAllTotal(res.data.overallTotal);
-    })
-    .catch((err)=>{
-      if(err.status === 403){
-        navigate("/");
-      }else{
-        console.log(err);
-      }
-    })
-  }
-  
-  // ---- for Last Six Month ---- 
-  
-  const getLastSixMonth = () => {
-    const today = new Date();
-
-  // End date is today
-  const endDate = new Date(today);
-  endDate.setHours(23, 59, 59, 999);
-
-  // Start date is 6 months ago
-  const startDate = new Date(today);
-  startDate.setMonth(startDate.getMonth() - 6);
-  startDate.setHours(0, 0, 0, 0);
-
-  return { startDate, endDate };
-  }
-
-  const getPieChartDataforLastSixMonth = () =>{
-
-    const { startDate, endDate } = getLastSixMonth();
-
-    axios.post("http://127.0.0.1:3000/api/report/expense/date",
-    {
-        startDate,
-        endDate,
-        "filterCategory" : filterCategory
-    },
-    {
-       headers : {
-        Authorization : `Bearer ${token}`
-       }
-      })
-      .then((res)=>{
-      setPieChartData(res.data.data);
-      setOverAllTotal(res.data.overallTotal);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-  }
-
-  // ----------- For Last Year ------------ 
-
-  const getLastYear = () => {
-    
-    const today = new Date();
-    const last_year = today.getFullYear() - 1;
-
-    return last_year;
-  }
-
-
-  const getPieChartDataforLastYear = () =>{
-   
-   const last_year= getLastYear();
-
-    axios.post("http://127.0.0.1:3000/api/report/expense/year",
-    {
-      "year" : last_year,
-      "filterCategory" : filterCategory
-    },
-    {
-       headers : {
-        Authorization : `Bearer ${token}`
-       }
-      })
-      .then((res)=>{
-        setPieChartData(res.data.data);
-        setOverAllTotal(Number(res.data.overallTotal) || 0);
-      })
-      .catch((err)=>{
-        console.log(err);
-      })
-    }
-
-  useEffect(() => {
-    if (filter === "year") {
-      getPieChartDataforYear();
-    }
-  
-    if (filter === "month") {
-      getPieChartDataforMonth();
-    }
-  
-    if (filter === "date") {
-      getPieChartDataforDate();
-    }
-  
-    if(filter === "previousMonth"){
-      getPieChartDataforPreviousMonth();
-    }
-    
-    if(filter === "sixMonth"){
-      getPieChartDataforLastSixMonth();
-    }
-    
-    if(filter === "lastYear"){
-      getPieChartDataforLastYear();
-    }
-  }, [filter, year, month, startDate,endDate,filterCategory]);
-
-   // 1️⃣ normalize totals (API-safe)
-      const overallTotalSafe = Number(overallTotal) || 0;
-  
-      // calculate filtered total only when a category is selected
-      const filteredTotal =
-        filterCategory === "All"
-          ? 0
-          : pieCharData.reduce(
-              (acc, item) => acc + Number(item.total || 0),
-              0
-            );
-  
-      // remaining amount
-      const remainingTotal = Math.max(
-        overallTotalSafe - filteredTotal,
-        0
-      );
-  
-  
-      // 2️⃣ base pie data (All categories)
-      const pieData = {
-        labels: pieCharData.map((item) => item.category),
-        data: pieCharData.map((item) => Number(item.total) || 0),
-        colors: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#8AFF33",
-          "#FF33F6",
-          "#33FFF3",
-        ],
-      };
-  
-      // 3️⃣ dynamic chart values
-      let pieChartSeries = [];
-      let chartLabels = [];
-      let chartColors = [];
-  
-      if (filterCategory === "All") {
-        pieChartSeries = pieData.data;
-        chartLabels = pieData.labels;
-        chartColors = pieData.colors;
-      } else if (filteredTotal > 0) {
-        pieCharData = [filteredTotal, remainingTotal];
-        chartLabels = [filterCategory, "Other Expenses"];
-        chartColors = ["#36A2EB", "#E0E0E0"];
-      }
-      else if (filteredTotal === 0) {
-        pieChartSeries = [filteredTotal, remainingTotal];
-        chartLabels = [filterCategory, "Other Expenses"];
-        chartColors = ["#36A2EB", "#E0E0E0"];
-      }
-  
-      // 4️⃣ chart options (ApexCharts)
-      const pieChartOptions = {
-        labels: chartLabels,
-        colors: chartColors,
-        legend: { position: "bottom" },
-        dataLabels: {
-          enabled: true,
-          formatter: (val) => `${val.toFixed(2)}%`,
-        },
-      };
-  
-  
 
   return (
     <>
@@ -725,7 +440,7 @@ useEffect(() => {
                 height="22"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#1fa2ff"
+                stroke="#FF6D00"
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -745,7 +460,7 @@ useEffect(() => {
                 height="22"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#1fa2ff"
+                stroke="#FF6D00"
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -769,42 +484,6 @@ useEffect(() => {
         <div className="dashboard-expense-list">
           <div className="expense-list-header">
             <div className="expense-list-title">Latest Expense</div>
-            {/* <div className="list-icon">
-              <button onClick={() => handleList("Back")} disabled={listPage === 1}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1fa2ff"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-arrow-left-icon lucide-arrow-left"
-                >
-                  <path d="m12 19-7-7 7-7" />
-                  <path d="M19 12H5" />
-                </svg>
-              </button>
-              <button onClick={() => handleList("Next")} disabled={listPage === totalPages}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1fa2ff"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-arrow-right-icon lucide-arrow-right"
-                >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </button>
-            </div> */}
           </div>
           <table className="expense-table">
             <thead>
@@ -830,99 +509,6 @@ useEffect(() => {
           </table>
         </div>
       </div>
-
-
-      <div className="repor-tpage-graphs">
-              <div className="report-header">
-                <div className="select-header">
-                  <select
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                  >
-                    <option value="year">Year</option>
-                    <option value="month">Month</option>
-                    <option value="date">Date</option>
-                    <option value="previousMonth">Previous Month</option>
-                    <option value="sixMonth">Last 6 Months</option>
-                    <option value="lastYear">Last Year</option>
-                  </select>
-                </div>
-                  <div className="filter-inputs">
-      
-                    {filter === "year" && (
-                      <DatePicker
-                        selected={year}
-                        onChange={(date) => setYear(date)}
-                        showYearPicker
-                        dateFormat="yyyy"
-                        className="custom-input"
-                      />
-                    )}
-      
-                    {filter === "month" && (
-                      <DatePicker
-                        selected={month}
-                        onChange={(date) => setMonth(date)}
-                        showMonthYearPicker
-                        dateFormat="MMM     yyyy" 
-                        className="custom-input"
-                      />
-                    )}
-      
-                    {filter === "date" && (
-                      <div className="date-range">
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        selectsStart
-                        startDate={startDate}
-                        dateFormat="yyyy-MM-dd"
-                        placeholderText="Start Date"
-                        className="custom-input"
-                      />
-                      <span>to</span>
-      
-                      <DatePicker
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                        selectsEnd
-                        endDate={endDate}
-                        dateFormat="yyyy-MM-dd"
-                        placeholderText="End Date"
-                        className="custom-input"
-                      />
-                    </div>
-                    )}
-                </div>
-              </div>
-                  
-              <div className="charts">
-                <div className="select-category">
-                  <label htmlFor="">Category : </label>
-                  <select className="categorySelector" onChange={(e)=>setFilterCategory(e.target.value)}>
-                    <option value="All">All Category</option>
-                    {category.map((item) => (
-                      <option key={item.id} value={item.name}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="pieChart">
-                  <div style={{ width: "350px" , alignItems : "start", height : "390px", maxWidth : "500px" , maxHeight : "500px" }}>
-                    {chartSeries.length > 0 && (
-                      <Chart
-                        type="pie"
-                        series={pieChartSeries}
-                        options={pieChartOptions}
-                        height="100%"
-                      />
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
     </>
   );
 }

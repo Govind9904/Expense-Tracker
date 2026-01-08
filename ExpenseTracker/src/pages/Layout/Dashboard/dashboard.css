@@ -138,6 +138,14 @@ body,
   animation: fadeInUp 0.5s ease 0.2s;
 }
 
+.apexcharts-tooltip {
+  color: #ff6d00 !important;
+}
+
+.apexcharts-tooltip-title {
+  color: #ff6d00 !important;
+}
+
 .graph-back-next-btn {
   display: flex;
   justify-content: flex-start;

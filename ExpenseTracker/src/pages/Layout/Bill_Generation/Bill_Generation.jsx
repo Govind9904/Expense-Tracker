@@ -287,7 +287,7 @@ const getLastSixMonth = () => {
   return (
     <div className="billgen-fullpage">
       <div className="billgen-topbar">
-            <h2>Generate Bill</h2>
+            <h2>Generate Expense</h2>
         <div className="billgen-period-row">
           <select
             value={phase}

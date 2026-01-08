@@ -30,6 +30,9 @@ router.post("/expense/year",authenticateToken,ExpenseController.getTotalYearly);
 // add Expense
 router.post("/add/expense", authenticateToken, ExpenseController.createExpense);
 
+//update Expense 
+router.post("/update/expense/:id",authenticateToken,ExpenseController.updateExpense);
+
 router.post('/expenses/monthly',authenticateToken,ExpenseController.getMonthlyDataforYear);
 
 router.post("/report/expense/year",authenticateToken,ExpenseController.getYearlyTotalforReport);

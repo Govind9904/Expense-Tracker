@@ -91,10 +91,11 @@
 }
 
 .line-chart {
-  margin-top: 20px;
+  margin-top: 120px;
+  width: 700px;
   border-radius: 12px;
   background: #1E1E1E;
-  padding: 30px;
+  padding: 5px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -104,31 +105,59 @@
   box-shadow: 0 10px 25px rgba(255, 109, 0, 0.4);
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-  margin: 10px 2px;
+.expense-list-title{
+  display: flex;
+  justify-self: center;
 }
 
+.graph-back-next-btn {
+    display: flex;
+    justify-content: flex-start;
+    gap: 8px;
+    align-items: baseline;
+    margin-bottom: 10px;
+}
+
+
+
+.table-edit-delete-svg svg {
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.table-edit-delete-svg svg:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}
+
+.graph-nav-btn
+{
+  background-color: #121212;
+}
+
+.listPage
+{
+  text-align: center;
+  margin-top: 12px;
+}
 
 button:hover {
   border: 1px solid #FF6D00 !important;
 }
 
+.list-icon {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;   /* ✅ THIS LINE */
+  gap: 10px;
+}
 
 .expense-list {
   border-radius: 12px;
-  height: 450px;
+  height: 500px;
   padding: 15px;
-  width: 700px;
-  margin-top: 128px;
+  width: 95%;
+  margin : 30px;
   background: #1E1E1E;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   overflow-y: auto;

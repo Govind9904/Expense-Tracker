@@ -694,3 +694,49 @@ exports.updateUserProfile = async (req,res) =>{
 }
 
 
+exports.updateExpense = async (req,res) => {
+  try{
+    const userId = req.user.id;
+    const expenseId = req.params.id;
+
+    const { date , description , amount , categoryId , payment_mode } = req.body;
+
+    const expense = await Expense.findOne({
+      where : { id : expenseId , userId },
+    });
+
+    if(!expense){
+      return res.status(404).json({
+        success: false,
+        msg: "Expense not found",
+      });
+    }
+
+    await expense.update({
+      date,
+      description,
+      amount,
+      categoryId,
+      payment_mode
+    })
+
+    const updatedExpense = await Expense.findByPk(expenseId,{
+      include : [{ model : Category , as : "category"}]
+    });
+
+    res.status(200).json({
+      success: true,
+      msg: "Expense updated successfully",
+      expense: updatedExpense,
+    })
+  }
+  catch(err){
+    console.error("Update Expense Error:", err);
+    res.status(500).json({
+      success: false,
+      msg: "Server error",
+    });
+  }
+};
+
+

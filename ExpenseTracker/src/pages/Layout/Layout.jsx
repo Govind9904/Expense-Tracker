@@ -64,7 +64,7 @@ function Layout() {
         <nav className="sidebar-nav">
           <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>Dashboard</NavLink>
           <NavLink to="/report" className={({ isActive }) => isActive ? "active" : ""}>Reports</NavLink>
-          <NavLink to="/bill/generation" className={({ isActive }) => isActive ? "active" : ""}>Expense Bill Generation</NavLink>
+          <NavLink to="/bill/generation" className={({ isActive }) => isActive ? "active" : ""}>Expense Generation</NavLink>
           <NavLink to="/profile" className={({ isActive }) => isActive ? "active" : ""}>Profile</NavLink>
         </nav>
 
