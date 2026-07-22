@@ -12,9 +12,8 @@ app.use(
     origin: "http://localhost:5173",
     methods: ["GET", "POST"],
     exposedHeaders: ["Content-Disposition"],
-  })
+  }),
 );
-
 
 app.get("/", (req, res) => {
   res.send("Server Running....!");
@@ -34,9 +33,8 @@ sequelize
   .then(() => console.log("DB synced"))
   .catch((err) => console.log(err));
 
-const ip = "127.0.0.1";
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.listen(port, ip, () =>
-  console.log(`Server Running at: http://${ip}:${port}`)
-);
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
